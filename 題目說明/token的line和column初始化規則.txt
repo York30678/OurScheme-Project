@@ -1,6 +1,8 @@
 token的line和column初始化規則
-當在某一行中的一個S-Expression進行output完畢後, 則從剛剛output完的下一個字元的地方立刻重置line和column值皆為1(新的開始)並重新開始計算, 接下來狀況分為兩個case
+當在某一行中的一個S-Expression進行output完畢後, 則從剛剛output完的下一個字元的地方立刻重置line和column值皆為1(新的開始)並重新開始計算, 接下來狀況分為兩個case :
+
 case1: 若發現從剛剛output完的最後一個字元之後的同一行中的後續內容僅全為space或tab或註解, 則把那些字元讀掉後(相當於視那些字元為無效內容), 接著進入到下一行處理該行字元的第一個字元才開始作為新的line 1 column 1(新的開始)去計算, 若此行的內容也是僅全為space或tab或註解, 則依然會把此不含有效token的行視為line 1(此行就會計算在內), 而不是直接略過到下一個有效token的位置才當作新的開始
+
 case2:若發現從剛剛output完的最後一個字元之後的同一行中的後續內容是不全為space或tab或註解, 則從剛剛output完的下一個字元的地方開始作為line 1 column 1 (新的開始)
 
 只要發現讀到的當下字元有造成Error的狀況(如違反文法規則), 則是output造成Error的該字元目前計算到所在的line和column, 之後把該Error同一行中的後續字元都直接讀掉(相當於視那些字元為無效內容)後進入到下一行進行重置line和column的值為1, 也就是發生Error的下一行的第一個字元就是新的開始, 若發生Error的下一行的內容是僅全為space或tab或註解, 則依然會把此不含有效token的行視為line 1(此行就會計算在內), 而不是直接略過到下一個有效token的位置才當作新的開始
