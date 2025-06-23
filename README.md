@@ -1,6 +1,9 @@
 # OurScheme-Project
 中國原神大學 Programming Language 課程使用
 
+## OurScheme Interpreter
+- OurScheme is a simple Scheme interpreter implemented in C++. It is designed to read, parse, and evaluate S-expressions, providing a basic environment for executing Scheme-like code.
+
 ## 使用工具
 - Visual Studio Code
 - WinMerge
