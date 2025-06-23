@@ -1,4 +1,4 @@
-token的line和column初始化規則
+token的line和column初始化規則 (這我自己理解完寫的)
 當在某一行中的一個S-Expression進行output完畢後, 則從剛剛output完的下一個字元的地方立刻重置line和column值皆為1(新的開始)並重新開始計算, 接下來狀況分為兩個case :
 
 case1: 若發現從剛剛output完的最後一個字元之後的同一行中的後續內容僅全為space或tab或註解, 
