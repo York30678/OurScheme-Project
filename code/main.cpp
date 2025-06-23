@@ -3478,7 +3478,7 @@ shared_ptr<SExp> Evaluator::primitiveEqv(vector<shared_ptr<SExp>>& args) {
 
 // equal?
 shared_ptr<SExp> Evaluator::primitiveEqual(vector<shared_ptr<SExp>>& args) {
-    checkArity("equal?", args, 2); // 確保參數數量
+    checkArity("equal?", args, 2); // 確保參數數量 
     
     return isEqual(args[0], args[1]) ? make_shared<SExp>(SExpType::T) : make_shared<SExp>(SExpType::NIL);
 }
