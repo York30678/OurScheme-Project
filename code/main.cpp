@@ -12,10 +12,10 @@
 
 using namespace std;
 
-bool hasEvalError = false; // ¥Î©ó¬ö¿ı¬O§_¦³¿ù»~µo¥Í
-bool isTopLevel = true; // ¥Î¨Ó´ú³Ì³»¼h
-bool haslambda = false; // ¨s·¥Ãz¯}ªk 
-bool verboseMode = true; // §Ñ¤F°µ== 
+bool hasEvalError = false; // ç”¨æ–¼ç´€éŒ„æ˜¯å¦æœ‰éŒ¯èª¤ç™¼ç”Ÿ
+bool isTopLevel = true; // ç”¨ä¾†æ¸¬æœ€é ‚å±¤
+bool haslambda = false; // ç©¶æ¥µçˆ†ç ´æ³• 
+bool verboseMode = true; // å¿˜äº†åš== 
 
 // S-expression type
 enum class SExpType {
@@ -33,8 +33,8 @@ public:
     shared_ptr<SExp> car;
     shared_ptr<SExp> cdr;
 
-    function<shared_ptr<SExp>(vector<shared_ptr<SExp>>&)> procValue; // ¦s¹ê»Úªº¨ç¼Æ
-    string procName; // ¦s¨ç¼Æ¦W(¦Lerror¥Î)
+    function<shared_ptr<SExp>(vector<shared_ptr<SExp>>&)> procValue; // å­˜å¯¦éš›çš„å‡½æ•¸
+    string procName; // å­˜å‡½æ•¸å(å°errorç”¨)
 
     //proj3
     vector<string> params;             
@@ -90,7 +90,7 @@ public:
     ParseError(int l, int c, string token, string expected, bool noClosingQuote = false, bool eof = false)
         : line(l), column(c), tokenValue(token), expectedMessage(expected), isNoClosingQuote(noClosingQuote), isEOF(eof) {}
     
-    const char* what() const noexcept override { // ¦Û­q³ø¿ùÃş§O 
+    const char* what() const noexcept override { // è‡ªè¨‚å ±éŒ¯é¡åˆ¥ 
         return "Parse Error";  
     }
 };
@@ -104,7 +104,7 @@ public:
     EvalError(string type, string token, bool divByZero = false) 
         : errorType(type), tokenValue(token), isDivByZero(divByZero) {}
         
-    const char* what() const noexcept override { // throw and catch, call e.what()(¥i±o¿ù»~°T®§)
+    const char* what() const noexcept override { // throw and catch, call e.what()(å¯å¾—éŒ¯èª¤è¨Šæ¯)
         return "Evaluation Error";
     }
 };
@@ -156,7 +156,7 @@ private:
     }
 
 public:
-    bool isFisttimeChange = false; // ¥Î©ó¬ö¿ı·í«eS-Exp³Ñ¤Uªº¤º®e¬O§_¬°¥ş³¡
+    bool isFisttimeChange = false; // ç”¨æ–¼ç´€éŒ„ç•¶å‰S-Expå‰©ä¸‹çš„å…§å®¹æ˜¯å¦ç‚ºå…¨éƒ¨
 
     InputManager() : currLine(0), currPos(0), eofReached(false), hasUnreadToken(false) {
         // testnum = trash
@@ -168,13 +168,13 @@ public:
         }
     }
     
-    // Àò¨ú·í«e¦r²Å
+    // ç²å–ç•¶å‰å­—ç¬¦
     char getCurrentChar() {
-        if (currLine >= lines.size()) { // ²Ä¤@¦¸©I¥scurrLine¬O0, line is empty, line = 0
-            if (!eofReached) { // ªì©l¬OFalse, ³o®É­ÔcurrLine = 0, currPos = 0
-                readMoreLines(); // Åª¤@¦æ
+        if (currLine >= lines.size()) { // ç¬¬ä¸€æ¬¡å‘¼å«currLineæ˜¯0, line is empty, line = 0
+            if (!eofReached) { // åˆå§‹æ˜¯False, é€™æ™‚å€™currLine = 0, currPos = 0
+                readMoreLines(); // è®€ä¸€è¡Œ
                 if (currLine >= lines.size()) {
-                    return '\0';  // ¯uªºEOF
+                    return '\0';  // çœŸçš„EOF
                 }
             } 
             else {
@@ -183,13 +183,13 @@ public:
         }
         
         if (currPos >= lines[currLine].length()) {
-            return '\n';  // ¦æ§À
+            return '\n';  // è¡Œå°¾
         }
         
-        return lines[currLine][currPos]; // Åª¨ú·í«estringªº²ÄcurrPos­Ó¦r¤¸
+        return lines[currLine][currPos]; // è®€å–ç•¶å‰stringçš„ç¬¬currPoså€‹å­—å…ƒ
     }
     
-    // «e¶i¤@­Ó¦r¤¸
+    // å‰é€²ä¸€å€‹å­—å…ƒ
     void advance() {
         if (currLine >= lines.size()) {
             if (!eofReached) {
@@ -202,7 +202,7 @@ public:
             currPos++;
         } 
         else {
-            // ²¾°Ê¨ì¤U¤@¦æ
+            // ç§»å‹•åˆ°ä¸‹ä¸€è¡Œ
             currLine++;
             currPos = 0;
             
@@ -246,35 +246,35 @@ public:
         }
         
         if (getCurrentChar() == '\n') {
-            advance();  // ¸õ¹L´«¦æ²Å
+            advance();  // è·³éæ›è¡Œç¬¦
         }
     }
     
-    // §PÂ_¬O§_¬°¤À¹j²Å
+    // åˆ¤æ–·æ˜¯å¦ç‚ºåˆ†éš”ç¬¦
     bool isSeparator(char c) {
         return isspace(c) || c == '(' || c == ')' || c == '\'' || c == '"' || c == ';' || c == '\0';
     }
     
-    // ²¾°Ê¨ì¤U¤@¦æ
+    // ç§»å‹•åˆ°ä¸‹ä¸€è¡Œ
     void moveToNextLine() {
         if (currLine < lines.size()) {
             currPos = lines[currLine].length();
-            advance();  // ³o±N²¾°Ê¨ì¤U¤@¦æ
+            advance();  // é€™å°‡ç§»å‹•åˆ°ä¸‹ä¸€è¡Œ
         }
     }
     
-    // «O¦s¤@­Ó¥¼Åªªºtoken
+    // ä¿å­˜ä¸€å€‹æœªè®€çš„token
     void ungetToken(Token token) {
         hasUnreadToken = true;
         unreadToken = token;
     }
     
-    // ÀË¬d¬O§_¦³¥¼Åªªºtoken
+    // æª¢æŸ¥æ˜¯å¦æœ‰æœªè®€çš„token
     bool hasToken() {
         return hasUnreadToken;
     }
     
-    // Àò¨ú¥¼Åªªºtoken
+    // ç²å–æœªè®€çš„token
     Token getToken() {
         hasUnreadToken = false;
         return unreadToken;
@@ -289,35 +289,35 @@ public:
     bool trashornot(){ 
         if (lines.empty()) return true;
     
-        // ¦sÀÉ·í«e¦ì¸m
+        // å­˜æª”ç•¶å‰ä½ç½®
         int temp = currPos;
     
-        // ÀË¬d¦æ¤¤¬O§_¥u¦³ªÅ¥Õ©Mµù¸Ñ
+        // æª¢æŸ¥è¡Œä¸­æ˜¯å¦åªæœ‰ç©ºç™½å’Œè¨»è§£
         string& line = lines[0];
         int i = currPos;
     
-        // ¸õ¹LªÅ¥Õ
+        // è·³éç©ºç™½
         while (i < line.length() && isspace(line[i])) {
             i++;
         }
     
-        // ÀË¬d¬O§_¬°µù¸Ñ©Î¦æ§À
+        // æª¢æŸ¥æ˜¯å¦ç‚ºè¨»è§£æˆ–è¡Œå°¾
         bool isTrash = (i >= line.length() || line[i] == ';');
     
-        // ÁÙ­ì¦ì¸m
+        // é‚„åŸä½ç½®
         currPos = temp;
         return isTrash;
     }
 
     void trashtoread(){
-        if (!lines.empty()) { // ¥¿±`¨ì¦¹line´N¥u¦³¦s¤@¦æinput
+        if (!lines.empty()) { // æ­£å¸¸åˆ°æ­¤lineå°±åªæœ‰å­˜ä¸€è¡Œinput
             lines.erase(lines.begin()); // clean up lines
         }
         
         readMoreLines();
     }
     
-    // Àò¨ú·í«e¦æªºªø«×
+    // ç²å–ç•¶å‰è¡Œçš„é•·åº¦
     int getCurrentLineLength() {
         if (currLine < lines.size()) {
             return lines[currLine].length();
@@ -326,12 +326,12 @@ public:
     }
 };
 
-// ¤ÀªR¾¹
+// åˆ†æå™¨
 class Lexer {
 private:
     InputManager& input;
     
-    // §PÂ_string¬O§_¬°¦³®Ä¼Æ¦r
+    // åˆ¤æ–·stringæ˜¯å¦ç‚ºæœ‰æ•ˆæ•¸å­—
     bool isValidNumber(string str) {
         if (str.empty()) return false;
         
@@ -363,7 +363,7 @@ private:
         return hasDigit;
     }
     
-    // ³B²zstring¤¤ªºÂà¸q
+    // è™•ç†stringä¸­çš„è½‰ç¾©
     string processEscapeSequences(string str) {
         string result;
         
@@ -371,7 +371,7 @@ private:
             if (str[i] == '\\' && i + 1 < str.length()) {
                 char next = str[i + 1];
                 if (next == 'n' || next == 't' || next == '\\' || next == '"') {
-                    // ¯S®íÂà¸q¦r¤¸
+                    // ç‰¹æ®Šè½‰ç¾©å­—å…ƒ
                     switch (next) {
                         case 'n': result += '\n'; break;
                         case 't': result += '\t'; break;
@@ -379,10 +379,10 @@ private:
                         case '"': result += '"'; break;
                     }
                     
-                    i++; // ¸õ¹LÂà¸q¦r¤¸«áªº¦r¤¸
+                    i++; // è·³éè½‰ç¾©å­—å…ƒå¾Œçš„å­—å…ƒ
                 }
 				else {
-                    // «D¯S®íÂà¸q(«O¯d­ì©l¤Ï±×¿¤) 
+                    // éç‰¹æ®Šè½‰ç¾©(ä¿ç•™åŸå§‹åæ–œç¸£) 
                     result += '\\';
                 }
             }
@@ -397,14 +397,14 @@ private:
 public:
     Lexer(InputManager& mgr) : input(mgr) {}
     
-    // §ì¤U¤@­Ótoken
+    // æŠ“ä¸‹ä¸€å€‹token
     Token getNextToken() {
-        // ÀË¬d¬O§_¦³³Q¹wÅª±¼ªºtoken
+        // æª¢æŸ¥æ˜¯å¦æœ‰è¢«é è®€æ‰çš„token
         if (input.hasToken()) {
             return input.getToken();
         }
         
-        // step1¡G¸õ¹LªÅ¥Õ©Mµù¸Ñ
+        // step1ï¼šè·³éç©ºç™½å’Œè¨»è§£
         while (true) {
             input.skipWhitespace();
             
@@ -416,21 +416,21 @@ public:
             }
         }
         
-        // ÀË¬d¬O§_¨ì¹FEOF
+        // æª¢æŸ¥æ˜¯å¦åˆ°é”EOF
         if (input.isEOF()) {
             return Token(SExpType::EOF_TOKEN, "EOF", input.getLineNumber(), input.getColumnNumber());
         }
         
-        // step2¡G§P§Otoken
-        // °O²Ä¤@­Ó¦r¤¸ªº¦ì¸m¨ÃÅª¶i¥hc
-        // ³o¸Ìºâªº¬O¯u¥¿ªºline©Mcolumn¦Ó¤£¬O¦blines¤¤ªº¦ì¸m
+        // step2ï¼šåˆ¤åˆ¥token
+        // è¨˜ç¬¬ä¸€å€‹å­—å…ƒçš„ä½ç½®ä¸¦è®€é€²å»c
+        // é€™è£¡ç®—çš„æ˜¯çœŸæ­£çš„lineå’Œcolumnè€Œä¸æ˜¯åœ¨linesä¸­çš„ä½ç½®
         int startLine = input.getLineNumber();  // return currLine + 1
         int startCol = input.getColumnNumber(); // return Pros + 1
-        // ¦]ªì©l¤Æ³£¬O0
+        // å› åˆå§‹åŒ–éƒ½æ˜¯0
 
-        char c = input.getCurrentChar(); // Åª¨ú·í«e¦r­ì 
+        char c = input.getCurrentChar(); // è®€å–ç•¶å‰å­—åŸ 
         
-        // ¯S®í¦r³B²z
+        // ç‰¹æ®Šå­—è™•ç†
         if (c == '(') {
             input.advance();
             return Token(SExpType::LEFT_PAREN, "(", startLine, startCol);
@@ -444,47 +444,47 @@ public:
             return Token(SExpType::QUOTE, "'", startLine, startCol);
         } 
         else if (c == '"') {
-            input.advance();  // ¸õ¹L¶}ÀYªºÂù¤Ş¸¹
+            input.advance();  // è·³éé–‹é ­çš„é›™å¼•è™Ÿ
             c = input.getCurrentChar();
             
-            // ¥ıÀË¬d¬O¤£¬O¦X²zªÅ¦r¦ê 
+            // å…ˆæª¢æŸ¥æ˜¯ä¸æ˜¯åˆç†ç©ºå­—ä¸² 
             if (c == '"') {
-                input.advance();  // ¸õ¹Lµ²§ÀªºÂù¤Ş¸¹
-                return Token(SExpType::STRING, "Empty_String", startLine, startCol); // ¦XªkªÅ¦r¦ê
+                input.advance();  // è·³éçµå°¾çš„é›™å¼•è™Ÿ
+                return Token(SExpType::STRING, "Empty_String", startLine, startCol); // åˆæ³•ç©ºå­—ä¸²
             }
             
-            string rawValue;  // ¥¼³B²zÂà¸qªº­ì©lstring
-            bool isEscaping = false;  // ·í«e¬O§_³B©óÂà¸qª¬ºA
+            string rawValue;  // æœªè™•ç†è½‰ç¾©çš„åŸå§‹string
+            bool isEscaping = false;  // ç•¶å‰æ˜¯å¦è™•æ–¼è½‰ç¾©ç‹€æ…‹
             
             while (true) {
                 c = input.getCurrentChar();
                 
                 if (c == '\0') {
-                    // EOF¦ı¦r²Å¦ê¥¼Ãö³¬
+                    // EOFä½†å­—ç¬¦ä¸²æœªé—œé–‰
                     return Token(SExpType::STRING, "", input.getLineNumber(), input.getColumnNumber() );
                 } 
 				else if (c == '\n' && !isEscaping) {
-                    // ¦æ§À¦ı¦r²Å¦ê¥¼Ãö³¬
+                    // è¡Œå°¾ä½†å­—ç¬¦ä¸²æœªé—œé–‰
                     return Token(SExpType::STRING, "", input.getLineNumber(), input.getCurrentLineLength() + 1);
                 }
                 
                 if (isEscaping) {
-                    // ¤w¦bÂà¸qª¬ºA(µL½×¤U¤@­Ó¦r¬O¤°»ò³£ª½±µ±µ¨ü) 
-                    rawValue += '\\';  // «O¯dÂà¸q¼Ğ°O
+                    // å·²åœ¨è½‰ç¾©ç‹€æ…‹(ç„¡è«–ä¸‹ä¸€å€‹å­—æ˜¯ä»€éº¼éƒ½ç›´æ¥æ¥å—) 
+                    rawValue += '\\';  // ä¿ç•™è½‰ç¾©æ¨™è¨˜
                     rawValue += c;
                     isEscaping = false;
                 } 
 				else if (c == '\\') {
-                    // ¶i¤JÂà¸qª¬ºA(¤£¥ß§Y¥[¦r) 
+                    // é€²å…¥è½‰ç¾©ç‹€æ…‹(ä¸ç«‹å³åŠ å­—) 
                     isEscaping = true;
                 }
 				else if (c == '"' && !isEscaping) {
-                    // «DÂà¸qªºÂù¤Ş¸¹ªí¥Üstringµ²§ô
-                    input.advance();  // ¸õ¹Lµ²§ÀªºÂù¤Ş¸¹
+                    // éè½‰ç¾©çš„é›™å¼•è™Ÿè¡¨ç¤ºstringçµæŸ
+                    input.advance();  // è·³éçµå°¾çš„é›™å¼•è™Ÿ
                     return Token(SExpType::STRING, processEscapeSequences(rawValue), startLine, startCol);
                 }
 				else {
-                    // ´¶³q¦r
+                    // æ™®é€šå­—
                     rawValue += c;
                 }
                 
@@ -492,7 +492,7 @@ public:
             }
         } 
         else {
-            // Åª¨ú²Å¸¹©Î¼Æ¦r
+            // è®€å–ç¬¦è™Ÿæˆ–æ•¸å­—
             string value;
             
             while (!input.isSeparator(input.getCurrentChar())) {
@@ -500,9 +500,9 @@ public:
                 input.advance();
             }
             
-            // °µ§¹¨ì³o column index ¹ï¦V¦b¥»S-Exp«áªº¤U¤@­Ó¦r¤¸¦ì¸m 
+            // åšå®Œåˆ°é€™ column index å°å‘åœ¨æœ¬S-Expå¾Œçš„ä¸‹ä¸€å€‹å­—å…ƒä½ç½® 
 
-            // ¯S®í²Å¸¹³B²z
+            // ç‰¹æ®Šç¬¦è™Ÿè™•ç†
             if (value == "nil" || value == "#f" || value == "()") {
                 return Token(SExpType::NIL, "nil", startLine, startCol);
             } 
@@ -513,7 +513,7 @@ public:
                 return Token(SExpType::DOT, ".", startLine, startCol);
             }
             
-            // §PÂ_¬O§_¬°¼Æ¦rÃş 
+            // åˆ¤æ–·æ˜¯å¦ç‚ºæ•¸å­—é¡ 
             if (isValidNumber(value)) {
                 if (value.find('.') != string::npos) {
                     return Token(SExpType::FLOAT, value, startLine, startCol);
@@ -523,13 +523,13 @@ public:
                 }
             }
             
-            // ¹w³]¬°SYMBOL 
+            // é è¨­ç‚ºSYMBOL 
             return Token(SExpType::SYMBOL, value, startLine, startCol);
         }
     }
 };
 
-// »yªk¤ÀªR¾¹
+// èªæ³•åˆ†æå™¨
 class Parser {
 private:
     Lexer& lexer;
@@ -538,7 +538,7 @@ private:
     bool hasError;
     string errorMessage;
     
-    // ¸ÑªR²Ä¤@±ø¤åªk 
+    // è§£æç¬¬ä¸€æ¢æ–‡æ³• 
     shared_ptr<SExp> parseAtom() {
         switch (currentToken.type) {
         
@@ -572,14 +572,14 @@ private:
                     throw ParseError(input.getLineNumber(), input.getColumnNumber(), "", "closing quote", true);
                 }
                 
-                if (currentToken.value == "Empty_String") currentToken.value.clear(); // ³o¬OªÅ¦r¦êªº±¡ªp, §â¦Û¤v¶ñªº©Ô¾÷²M±¼ 
+                if (currentToken.value == "Empty_String") currentToken.value.clear(); // é€™æ˜¯ç©ºå­—ä¸²çš„æƒ…æ³, æŠŠè‡ªå·±å¡«çš„æ‹‰æ©Ÿæ¸…æ‰ 
                 
                 string value = currentToken.value;
                 //currentToken = lexer.getNextToken();
                 return make_shared<SExp>(value, SExpType::STRING);
             }
             case SExpType::SYMBOL: {
-                string value = currentToken.value; // token¤º®e¦s¤Jvalue
+                string value = currentToken.value; // tokenå…§å®¹å­˜å…¥value
                 //currentToken = lexer.getNextToken();
                 return make_shared<SExp>(value, SExpType::SYMBOL);
             }
@@ -596,9 +596,9 @@ private:
         }
     }
     
-    // ¸ÑªR²Ä¤G±ø¤åªk
+    // è§£æç¬¬äºŒæ¢æ–‡æ³•
     shared_ptr<SExp> parseList() {
-        currentToken = lexer.getNextToken(); // ¥ª¬A¸¹¤U¤@­Ó¦r¤¸ 
+        currentToken = lexer.getNextToken(); // å·¦æ‹¬è™Ÿä¸‹ä¸€å€‹å­—å…ƒ 
         
         // null case
         if (currentToken.type == SExpType::RIGHT_PAREN) {
@@ -606,7 +606,7 @@ private:
             return make_shared<SExp>(SExpType::NIL);
         }
         
-        // ¸ÑªR¦Cªí²Ä¤@­Ó¤¸¯À
+        // è§£æåˆ—è¡¨ç¬¬ä¸€å€‹å…ƒç´ 
         shared_ptr<SExp> first;
         if (currentToken.type == SExpType::LEFT_PAREN) {
             first = parseList();
@@ -620,7 +620,7 @@ private:
         
         currentToken = lexer.getNextToken();
         
-        // ÀË¬d¬O§_¬°ÂI¹ïªí¥Üªk
+        // æª¢æŸ¥æ˜¯å¦ç‚ºé»å°è¡¨ç¤ºæ³•
         if (currentToken.type == SExpType::DOT) {
             currentToken = lexer.getNextToken();
             
@@ -646,11 +646,11 @@ private:
             }
             
 
-            //currentToken = lexer.getNextToken(); // ¥k¬A¸¹¤U¤@­Ó¦r(¹wÅª¥Î) 
+            //currentToken = lexer.getNextToken(); // å³æ‹¬è™Ÿä¸‹ä¸€å€‹å­—(é è®€ç”¨) 
             return make_shared<SExp>(first, rest);
         } 
         else {
-            // ¼Ğ·Ç¦Cªí¸ÑªR
+            // æ¨™æº–åˆ—è¡¨è§£æ
             vector<shared_ptr<SExp>> elements;
             elements.push_back(first);
             
@@ -661,7 +661,7 @@ private:
                 }
                 
                 if (currentToken.type == SExpType::DOT) {
-                    // ÂI¹ïªí¥Üªk
+                    // é»å°è¡¨ç¤ºæ³•
                     currentToken = lexer.getNextToken();
                     
                     shared_ptr<SExp> last;
@@ -683,7 +683,7 @@ private:
                     
                     //currentToken = lexer.getNextToken();
                     
-                    // ºc«ØÂI¹ïµ²ºc
+                    // æ§‹å»ºé»å°çµæ§‹
                     shared_ptr<SExp> result = last;
                     for (int i = elements.size() - 1; i >= 0; i--) {
                         result = make_shared<SExp>(elements[i], result);
@@ -692,7 +692,7 @@ private:
                     return result;
                 }
                 
-                // ¸ÑªR¤U¤@­Ó¤¸¯À
+                // è§£æä¸‹ä¸€å€‹å…ƒç´ 
                 shared_ptr<SExp> next;
                 if (currentToken.type == SExpType::LEFT_PAREN) {
                     next = parseList();
@@ -709,10 +709,10 @@ private:
                 elements.push_back(next);
             }
             
-            // ¥k¬A¸¹¤U¤@­Ó¦r 
+            // å³æ‹¬è™Ÿä¸‹ä¸€å€‹å­— 
             // currentToken = lexer.getNextToken();
             
-            // ºc«Ø´¶³q¦Cªí
+            // æ§‹å»ºæ™®é€šåˆ—è¡¨
             shared_ptr<SExp> result = make_shared<SExp>(SExpType::NIL);
             for (int i = elements.size() - 1; i >= 0; i--) {
                 result = make_shared<SExp>(elements[i], result);
@@ -722,16 +722,16 @@ private:
         }
     }
     
-    // ¸ÑªR²Ä¤T±ø¤åªk 
+    // è§£æç¬¬ä¸‰æ¢æ–‡æ³• 
     shared_ptr<SExp> parseQuote() {
-        currentToken = lexer.getNextToken(); // ¤Ş¸¹¤U¤@­Ó¦r 
+        currentToken = lexer.getNextToken(); // å¼•è™Ÿä¸‹ä¸€å€‹å­— 
         
-        // ÀË¬d¬O§_¹J¨ì EOF
+        // æª¢æŸ¥æ˜¯å¦é‡åˆ° EOF
         if (currentToken.type == SExpType::EOF_TOKEN) {
-            throw ParseError(input.getLineNumber(), input.getColumnNumber(), "EOF", "", false, true); // ¼Ğ°O¬° isEOF=true ªº¿ù»~ 
+            throw ParseError(input.getLineNumber(), input.getColumnNumber(), "EOF", "", false, true); // æ¨™è¨˜ç‚º isEOF=true çš„éŒ¯èª¤ 
         }
         
-        // ¸ÑªR¤Ş¥Îªºªí¹F¦¡
+        // è§£æå¼•ç”¨çš„è¡¨é”å¼
         shared_ptr<SExp> quoted;
         if (currentToken.type == SExpType::LEFT_PAREN) {
             quoted = parseList();
@@ -743,7 +743,7 @@ private:
             quoted = parseAtom();
         }
         
-        // ºc«Ø (quote <quoted>) ªí¹F¦¡
+        // æ§‹å»º (quote <quoted>) è¡¨é”å¼
         shared_ptr<SExp> quoteSymbol = make_shared<SExp>("quote", SExpType::SYMBOL);
         shared_ptr<SExp> nil = make_shared<SExp>(SExpType::NIL);
         shared_ptr<SExp> quotedCons = make_shared<SExp>(quoted, nil);
@@ -757,39 +757,39 @@ public:
         currentToken = lexer.getNextToken();
     }
     
-    // ¸ÑªR¤@­Ó§¹¾ãªºS-Exp
+    // è§£æä¸€å€‹å®Œæ•´çš„S-Exp
     shared_ptr<SExp> parse() {
         try {
-            // ÀË¬d¬O§_¬°EOF
+            // æª¢æŸ¥æ˜¯å¦ç‚ºEOF
             if (currentToken.type == SExpType::EOF_TOKEN) {
                 throw ParseError(input.getLineNumber(), input.getColumnNumber(), "EOF", "", false, true);
             }
             
-            // ®Ú¾Ú¥Ø«etokenÃş«¬¿ï¸ÑªR¤èªk
+            // æ ¹æ“šç›®å‰tokené¡å‹é¸è§£ææ–¹æ³•
             shared_ptr<SExp> result;
-            if (currentToken.type == SExpType::LEFT_PAREN) { // ¤åªk²Ä¤G±ø
+            if (currentToken.type == SExpType::LEFT_PAREN) { // æ–‡æ³•ç¬¬äºŒæ¢
                 result = parseList();
             } 
-            else if (currentToken.type == SExpType::QUOTE) { // ¤åªk²Ä¤T±ø
+            else if (currentToken.type == SExpType::QUOTE) { // æ–‡æ³•ç¬¬ä¸‰æ¢
                 result = parseQuote();
             } 
-            else { // ¤åªk²Ä¤@±ø
+            else { // æ–‡æ³•ç¬¬ä¸€æ¢
                 result = parseAtom();
             }           
             
             //cout << "Befor !!! Line : " << input.getLineNumber() << ", Column Index : " << input.getColumnNumber()-1 << endl;
-            // ¦¹³Bªºline¬°¹ê»Úinput¤¤ªº¦æ¼Æ, column¬°·í«eS-Expªº¤U¤@­Ó¦r¤¸Äæ¦ì¼Æ
-            input.cleanup(); // ¦sinputªºvector²MªÅ¨ì³Ñ¥¼³B¸Ì§¹ªº¤º®e
-            input.resetLine(); // ­«³]¦æ¸¹ = 0
-            input.resetColumn(); // ­«³]¦C¸¹ = 0
-            // ¥ıÀË¬d³Ñ¾lªº·í«e¦æÁÙ¦³µL§¹¥ş¥Ñ whitespace + tab + µù¸Ñ²Õ¦¨ªº¤º®e
-            if (input.trashornot()){ // true´N¬O³£©U§£­nª½±µ²MªÅ¤º®e¥hÅª¤U¤@¦æ¶i¨Ó(¦]¸Ó¦æ·|¤£­p¦æ¼Æ)
-                input.trashtoread(); // Åª¤@¦æ
+            // æ­¤è™•çš„lineç‚ºå¯¦éš›inputä¸­çš„è¡Œæ•¸, columnç‚ºç•¶å‰S-Expçš„ä¸‹ä¸€å€‹å­—å…ƒæ¬„ä½æ•¸
+            input.cleanup(); // å­˜inputçš„vectoræ¸…ç©ºåˆ°å‰©æœªè™•è£¡å®Œçš„å…§å®¹
+            input.resetLine(); // é‡è¨­è¡Œè™Ÿ = 0
+            input.resetColumn(); // é‡è¨­åˆ—è™Ÿ = 0
+            // å…ˆæª¢æŸ¥å‰©é¤˜çš„ç•¶å‰è¡Œé‚„æœ‰ç„¡å®Œå…¨ç”± whitespace + tab + è¨»è§£çµ„æˆçš„å…§å®¹
+            if (input.trashornot()){ // trueå°±æ˜¯éƒ½åƒåœ¾è¦ç›´æ¥æ¸…ç©ºå…§å®¹å»è®€ä¸‹ä¸€è¡Œé€²ä¾†(å› è©²è¡Œæœƒä¸è¨ˆè¡Œæ•¸)
+                input.trashtoread(); // è®€ä¸€è¡Œ
             }
   
-            // ¹wÅª¤U¤@­Ótoken
+            // é è®€ä¸‹ä¸€å€‹token
             currentToken = lexer.getNextToken();
-            // «O¦s·í«etoken¥H«K¤U¦¸¨Ï¥Î
+            // ä¿å­˜ç•¶å‰tokenä»¥ä¾¿ä¸‹æ¬¡ä½¿ç”¨
             input.ungetToken(currentToken);
             
             return result;
@@ -800,8 +800,8 @@ public:
             if (e.isNoClosingQuote) {
                 errorMessage = "ERROR (no closing quote) : END-OF-LINE encountered at Line " + to_string(e.line) + " Column " + to_string(e.column);
                 input.cleanup();
-                input.resetLine(); // ­«³]¦æ¸¹ = 0
-                input.resetColumn(); // ­«³]¦C¸¹ = 0
+                input.resetLine(); // é‡è¨­è¡Œè™Ÿ = 0
+                input.resetColumn(); // é‡è¨­åˆ—è™Ÿ = 0
                 input.trashtoread();
                 currentToken = lexer.getNextToken();
                 input.ungetToken(currentToken);
@@ -812,8 +812,8 @@ public:
 			else {
                 errorMessage = "ERROR (unexpected token) : " + e.expectedMessage + " expected when token at Line " + to_string(e.line) + " Column " + to_string(e.column-1) + " is >>" + e.tokenValue + "<<";
                 input.cleanup();
-                input.resetLine(); // ­«³]¦æ¸¹ = 0
-                input.resetColumn(); // ­«³]¦C¸¹ = 0
+                input.resetLine(); // é‡è¨­è¡Œè™Ÿ = 0
+                input.resetColumn(); // é‡è¨­åˆ—è™Ÿ = 0
                 input.trashtoread();
                 currentToken = lexer.getNextToken();
                 input.ungetToken(currentToken);
@@ -831,13 +831,13 @@ public:
 	    return errorMessage; 
 	}
     
-    // ÀË¬d¬O§_¤w¨ì¹FEOF
+    // æª¢æŸ¥æ˜¯å¦å·²åˆ°é”EOF
     bool isAtEOF() {
         return currentToken.type == SExpType::EOF_TOKEN;
     }
 };
 
-// S-Exp¥´¦L¾¹
+// S-Expæ‰“å°å™¨
 class Printer {
 public:
     void print(shared_ptr<SExp> sexp) {
@@ -848,7 +848,7 @@ public:
                 cout << sexp->intVal;
                 break;
             case SExpType::FLOAT: {
-                //·F¥|±Ë¤­¤J¥L¶ı¶W¦n¥Î
+                //å¹¹å››æ¨äº”å…¥ä»–åª½è¶…å¥½ç”¨
                 double rounded = round(sexp->floatVal * 1000) / 1000;
                 cout << fixed << setprecision(3) << rounded;
                 break;
@@ -856,16 +856,16 @@ public:
             case SExpType::STRING:
                 cout << "\"" << sexp->stringVal << "\"";
                 break;
-            case SExpType::SYSTEM_MESSAGE: // ¨t²Î¤º³¡function¹B§@§¹¦¨°T®§  
+            case SExpType::SYSTEM_MESSAGE: // ç³»çµ±å…§éƒ¨functioné‹ä½œå®Œæˆè¨Šæ¯  
                 cout << sexp->stringVal;  
                 break;
             case SExpType::SYMBOL:
                 cout << sexp->symbolVal;
                 break;
-            case SExpType::PRIMITIVE_PROC: // «O¯d¦r 
+            case SExpType::PRIMITIVE_PROC: // ä¿ç•™å­— 
                 cout << "#<procedure " << sexp->procName << ">";
                 break;
-            case SExpType::USER_PROC:  // «O¯d¦r 
+            case SExpType::USER_PROC:  // ä¿ç•™å­— 
                 cout << "#<procedure " << sexp->procName << ">";
                 break;
             case SExpType::NIL:
@@ -888,20 +888,20 @@ private:
     void printPair(shared_ptr<SExp> pair, int indent) {
         if (!pair) return;
         
-        cout << "( ";  // ¥ª¬A¸¹«á­±¸ò¤@­ÓªÅ®æ
+        cout << "( ";  // å·¦æ‹¬è™Ÿå¾Œé¢è·Ÿä¸€å€‹ç©ºæ ¼
         
-        // ª½±µ³B²z²Ä¤@­Ó¤¸¯À, ¤£´«¦æ
+        // ç›´æ¥è™•ç†ç¬¬ä¸€å€‹å…ƒç´ , ä¸æ›è¡Œ
         if (pair->car) {
             if (pair->car->type == SExpType::PAIR) {
-                // ¦pªG¬O¦Cªí, »¼°j³B²z
+                // å¦‚æœæ˜¯åˆ—è¡¨, éè¿´è™•ç†
                 printPair(pair->car, indent + 2);
             } else {
-                // ¨ä¥LAtomª½±µ¦L 
+                // å…¶ä»–Atomç›´æ¥å° 
                 printAtom(pair->car);
             }
         }
         
-        // ³B²z³Ñ¤U¤¸¯À
+        // è™•ç†å‰©ä¸‹å…ƒç´ 
         shared_ptr<SExp> rest = pair->cdr;
         while (rest && rest->type == SExpType::PAIR) {
             cout << endl;
@@ -909,10 +909,10 @@ private:
             
             if (rest->car) {
                 if (rest->car->type == SExpType::PAIR) {
-                    // ¦pªG¬O¦Cªí´N»¼°j³B²z
+                    // å¦‚æœæ˜¯åˆ—è¡¨å°±éè¿´è™•ç†
                     printPair(rest->car, indent + 2);
                 } else {
-                    // Atomª½±µ¦L 
+                    // Atomç›´æ¥å° 
                     printAtom(rest->car);
                 }
             }
@@ -920,7 +920,7 @@ private:
             rest = rest->cdr;
         }
         
-        // ³B²zÂI¹ïªí¥Üªkªº±¡ªp
+        // è™•ç†é»å°è¡¨ç¤ºæ³•çš„æƒ…æ³
         if (rest && rest->type != SExpType::NIL) {
             cout << endl;
             for (int i = 0; i < indent + 2; i++) cout << " ";
@@ -937,13 +937,13 @@ private:
             }
         }
         
-        // ¦L¥k¬A¸¹
+        // å°å³æ‹¬è™Ÿ
         cout << endl;
         for (int i = 0; i < indent; i++) cout << " ";
         cout << ")";
     }
     
-    // ¦LAtomªí¹F¦¡
+    // å°Atomè¡¨é”å¼
     void printAtom(shared_ptr<SExp> atom) {
         if (!atom) return;
         
@@ -952,7 +952,7 @@ private:
                 cout << atom->intVal;
                 break;
             case SExpType::FLOAT: {
-            	//·F¥|±Ë¤­¤J¥L¶ı¶W¦n¥Î 
+            	//å¹¹å››æ¨äº”å…¥ä»–åª½è¶…å¥½ç”¨ 
                 double rounded = round(atom->floatVal * 1000) / 1000;
                 cout << fixed << setprecision(3) << rounded;
                 break;
@@ -963,10 +963,10 @@ private:
             case SExpType::SYMBOL:
                 cout << atom->symbolVal;
                 break;
-            case SExpType::PRIMITIVE_PROC:  // «O¯d¦r 
+            case SExpType::PRIMITIVE_PROC:  // ä¿ç•™å­— 
                 cout << "#<procedure " << atom->procName << ">";
                 break;
-            case SExpType::USER_PROC:  // «O¯d¦r 
+            case SExpType::USER_PROC:  // ä¿ç•™å­— 
                 cout << "#<procedure " << atom->procName << ">";
                 break;
             case SExpType::NIL:
@@ -984,32 +984,32 @@ private:
     }
 };
 
-// S-Exp°õ¦æ¾¹ 
-// !!!­n¼gªºfunction¤Ó¦h¤F, ©Ò¥H§â©w¸q¼g¦bclass¸Ì­±, ¹ê»Ú¥\¯à©Ô¨ì¥~­±¼g!!! 
+// S-ExpåŸ·è¡Œå™¨ 
+// !!!è¦å¯«çš„functionå¤ªå¤šäº†, æ‰€ä»¥æŠŠå®šç¾©å¯«åœ¨classè£¡é¢, å¯¦éš›åŠŸèƒ½æ‹‰åˆ°å¤–é¢å¯«!!! 
 class Evaluator {
 private:
-    // Àô¹Ò¡]¬dªí¥Î¡^
+    // ç’°å¢ƒï¼ˆæŸ¥è¡¨ç”¨ï¼‰
     unordered_map<string, shared_ptr<SExp>> environment;
     InputManager* globalInput;
     Lexer* globalLexer;
     
-    // ¿ù»~³B²z
+    // éŒ¯èª¤è™•ç†
     bool hasError;
     string errorMessage;
     
-    // S-ExpÂà¦r¦ê¡]¥Î©ó¿ù»~°T®§¡^
+    // S-Expè½‰å­—ä¸²ï¼ˆç”¨æ–¼éŒ¯èª¤è¨Šæ¯ï¼‰
     string exprToString(shared_ptr<SExp> expr);
     
-    // ÀË¬d¬O§_¬°¤º«Ø­ì©l¨ç¼Æ¦W
+    // æª¢æŸ¥æ˜¯å¦ç‚ºå…§å»ºåŸå§‹å‡½æ•¸å
     bool isPrimitive(string name);
     
-    // ªì©l¤Æ©Ò¦³­ì©l¨ç¼Æ
+    // åˆå§‹åŒ–æ‰€æœ‰åŸå§‹å‡½æ•¸
     void initPrimitives();
     
-    // °õ¦æList
+    // åŸ·è¡ŒList
     bool evalList(shared_ptr<SExp> expr, shared_ptr<SExp>& result);
     
-    // eval¥\¯à 
+    // evalåŠŸèƒ½ 
     bool evalQuote(shared_ptr<SExp> expr, shared_ptr<SExp>& result);
     bool evalDefine(shared_ptr<SExp> expr, shared_ptr<SExp>& result);
     bool evalLambda(shared_ptr<SExp> expr, shared_ptr<SExp>& result);
@@ -1020,18 +1020,18 @@ private:
     bool evalOr(shared_ptr<SExp> expr, shared_ptr<SExp>& result);
     bool evalBegin(shared_ptr<SExp> expr, shared_ptr<SExp>& result);
     
-    // ÃB¥~ÀË¬d 
+    // é¡å¤–æª¢æŸ¥ 
     bool evalCleanEnv(shared_ptr<SExp> expr, shared_ptr<SExp>& result);
     bool evalExit(shared_ptr<SExp> expr, shared_ptr<SExp>& result);
     
-    // ÀË¬d¬O§_List 
+    // æª¢æŸ¥æ˜¯å¦List 
     bool isList(shared_ptr<SExp> expr);
     
-    // !!! ¯Â¨ç¼Æ¦¡­pºâ«Å§i¦¨static¦n¤F !!! 
-    // ¶]¨â­ÓS-Exp¤ñ¸û¬O§_µ²ºc¬Ûµ¥ 
+    // !!! ç´”å‡½æ•¸å¼è¨ˆç®—å®£å‘Šæˆstaticå¥½äº† !!! 
+    // è·‘å…©å€‹S-Expæ¯”è¼ƒæ˜¯å¦çµæ§‹ç›¸ç­‰ 
     static bool isEqual(shared_ptr<SExp> a, shared_ptr<SExp> b);
     
-    // ¥H¤Uprimitive¬ÛÃö 
+    // ä»¥ä¸‹primitiveç›¸é—œ 
 
     // proj4
     static shared_ptr<SExp> primitiveCreateErrorObject(vector<shared_ptr<SExp>>& args);
@@ -1046,15 +1046,15 @@ private:
 
     bool evalSet(shared_ptr<SExp> expr, shared_ptr<SExp>& result);
 
-    // «Øºc¥\¯à 
+    // å»ºæ§‹åŠŸèƒ½ 
     static shared_ptr<SExp> primitiveCons(vector<shared_ptr<SExp>>& args);
     static shared_ptr<SExp> primitiveList(vector<shared_ptr<SExp>>& args);
     
-    // ¨ú­È¥\¯à
+    // å–å€¼åŠŸèƒ½
     static shared_ptr<SExp> primitiveCar(vector<shared_ptr<SExp>>& args);
     static shared_ptr<SExp> primitiveCdr(vector<shared_ptr<SExp>>& args);
     
-    // §PÂ_¥\¯à
+    // åˆ¤æ–·åŠŸèƒ½
     static shared_ptr<SExp> primitiveAtom(vector<shared_ptr<SExp>>& args);
     static shared_ptr<SExp> primitivePair(vector<shared_ptr<SExp>>& args);
     static shared_ptr<SExp> primitiveIsList(vector<shared_ptr<SExp>>& args);
@@ -1066,81 +1066,81 @@ private:
     static shared_ptr<SExp> primitiveBoolean(vector<shared_ptr<SExp>>& args);
     static shared_ptr<SExp> primitiveSymbol(vector<shared_ptr<SExp>>& args);
     
-    // ¥|«h¹Bºâ
+    // å››å‰‡é‹ç®—
     static shared_ptr<SExp> primitiveAdd(vector<shared_ptr<SExp>>& args);
     static shared_ptr<SExp> primitiveSubtract(vector<shared_ptr<SExp>>& args);
     static shared_ptr<SExp> primitiveMultiply(vector<shared_ptr<SExp>>& args);
     static shared_ptr<SExp> primitiveDivide(vector<shared_ptr<SExp>>& args);
     
-    // ÀË¬d¥\¯à 
+    // æª¢æŸ¥åŠŸèƒ½ 
     static shared_ptr<SExp> primitiveNot(vector<shared_ptr<SExp>>& args);
     
-    // ¤ñ¸û¥\¯à 
+    // æ¯”è¼ƒåŠŸèƒ½ 
     static shared_ptr<SExp> primitiveGreater(vector<shared_ptr<SExp>>& args); // > 
     static shared_ptr<SExp> primitiveGreaterEqual(vector<shared_ptr<SExp>>& args);
     static shared_ptr<SExp> primitiveLess(vector<shared_ptr<SExp>>& args); // <
     static shared_ptr<SExp> primitiveLessEqual(vector<shared_ptr<SExp>>& args);
     static shared_ptr<SExp> primitiveNumEqual(vector<shared_ptr<SExp>>& args);
     
-    // ¦r¦ê¾Ş§@¥\¯à 
+    // å­—ä¸²æ“ä½œåŠŸèƒ½ 
     static shared_ptr<SExp> primitiveStringAppend(vector<shared_ptr<SExp>>& args);
     static shared_ptr<SExp> primitiveStringGreater(vector<shared_ptr<SExp>>& args);
     static shared_ptr<SExp> primitiveStringLess(vector<shared_ptr<SExp>>& args);
     static shared_ptr<SExp> primitiveStringEqual(vector<shared_ptr<SExp>>& args);
     
-    // ¬Ûµ¥´ú¸Õ
+    // ç›¸ç­‰æ¸¬è©¦
     static shared_ptr<SExp> primitiveEqv(vector<shared_ptr<SExp>>& args);
     static shared_ptr<SExp> primitiveEqual(vector<shared_ptr<SExp>>& args);
     
-    // ÀË¬d°Ñ¼Æ¼Æ¶q¥Î
+    // æª¢æŸ¥åƒæ•¸æ•¸é‡ç”¨
     static void checkArity(string name, vector<shared_ptr<SExp>> args, int expected, bool exact = true);
     
-    // ¨ú­È¡]³B²zINT©MFLOATªºÂà´«¡^
+    // å–å€¼ï¼ˆè™•ç†INTå’ŒFLOATçš„è½‰æ›ï¼‰
     static double getNumber(shared_ptr<SExp> arg, string funcName);
     
-    // ¥u¦n¦A«Å§i¤@­ÓPrinter¨Ó¦LERRORªº«á¤è¤º®e (¦]­ì¥ıexpr¤º®e¨S¿ìªk®æ¦¡¤Æ¿é¥X) 
+    // åªå¥½å†å®£å‘Šä¸€å€‹Printerä¾†å°ERRORçš„å¾Œæ–¹å…§å®¹ (å› åŸå…ˆexprå…§å®¹æ²’è¾¦æ³•æ ¼å¼åŒ–è¼¸å‡º) 
     static string formatExprForError(shared_ptr<SExp> expr) {
         if (!expr) return "nil";
         
-        // §Ú¬O¤Ñ¤~ 
-        streambuf* oldCout = cout.rdbuf(); // ¼È¦s­ì¥»coutªº¿é¥X¥Ø¼Ğ¡]streambuf¡^
-        stringstream ss; // ¦r¦ê¿é¥X¬y 
-        cout.rdbuf(ss.rdbuf()); // ¥Î¦¹ªk§âcoutªº¿é¥X§ï¦¨¼g¤Jss
+        // æˆ‘æ˜¯å¤©æ‰ 
+        streambuf* oldCout = cout.rdbuf(); // æš«å­˜åŸæœ¬coutçš„è¼¸å‡ºç›®æ¨™ï¼ˆstreambufï¼‰
+        stringstream ss; // å­—ä¸²è¼¸å‡ºæµ 
+        cout.rdbuf(ss.rdbuf()); // ç”¨æ­¤æ³•æŠŠcoutçš„è¼¸å‡ºæ”¹æˆå¯«å…¥ss
         
-        // ¥ÎPrinter§â­n¦Lªº®æ¦¡§Ë¥X¨Ó¨ìss 
+        // ç”¨PrinteræŠŠè¦å°çš„æ ¼å¼å¼„å‡ºä¾†åˆ°ss 
         Printer printer;
         printer.print(expr);
         
-        cout.rdbuf(oldCout); // °O±o§âcoutªº¿é¥X¥Ø¼Ğ³]¦^­ì¥»ªºoldCout, ¤Ï¥¿´N¬O«ì´_­ìª¬ 
+        cout.rdbuf(oldCout); // è¨˜å¾—æŠŠcoutçš„è¼¸å‡ºç›®æ¨™è¨­å›åŸæœ¬çš„oldCout, åæ­£å°±æ˜¯æ¢å¾©åŸç‹€ 
         
-        return ss.str(); // ³o¤£´N±o¨ì±a¦³®æ¦¡¤Æªºexpr¤F 
+        return ss.str(); // é€™ä¸å°±å¾—åˆ°å¸¶æœ‰æ ¼å¼åŒ–çš„expräº† 
     }
 
 public:
-    // «Øºc¤l
+    // å»ºæ§‹å­
     Evaluator();
     
-    // °_©lfunction 
+    // èµ·å§‹function 
     bool EvalSExp(shared_ptr<SExp> expr, shared_ptr<SExp>& result);
     
-    // ²Å¸¹¨D­È
+    // ç¬¦è™Ÿæ±‚å€¼
     bool evalSymbol(shared_ptr<SExp> expr, shared_ptr<SExp>& result);
     
-    // ²M²zÀô¹Ò(clean-environment)
+    // æ¸…ç†ç’°å¢ƒ(clean-environment)
     void cleanEnvironment();
     
-    // ¿ù»~³B²z¥Î 
+    // éŒ¯èª¤è™•ç†ç”¨ 
     string getErrorMessage();
     bool hasEncounteredError();
     void resetError();
     
-    // ÀË¬d¬O§_·|¥Î¨ì lambda
+    // æª¢æŸ¥æ˜¯å¦æœƒç”¨åˆ° lambda
     bool willUseLambda(shared_ptr<SExp> expr);
     bool willUseLambdaHelper(shared_ptr<SExp> expr, unordered_set<string>& visited);
-    // ¥[SYSTEM_MESSAGE
+    // åŠ SYSTEM_MESSAGE
     shared_ptr<SExp> createSystemMessage(string message) {
         if (!verboseMode) {
-            // ¦pªG«D verbose ¼Ò¦¡´N¦^¶Ç nil ¦Ó¤£¬OSYSMES 
+            // å¦‚æœé verbose æ¨¡å¼å°±å›å‚³ nil è€Œä¸æ˜¯SYSMES 
             return make_shared<SExp>(SExpType::NIL);
         }
         
@@ -1156,12 +1156,12 @@ public:
     }
 };
 
-// «Øºc¤l 
+// å»ºæ§‹å­ 
 Evaluator::Evaluator() : hasError(false) {
     initPrimitives();
 }
 
-// ¦n¹³¨SÔ£§¾¥Î 
+// å¥½åƒæ²’å•¥å±ç”¨ 
 string Evaluator::exprToString(shared_ptr<SExp> expr) {
     if (!expr) return "nil";
     
@@ -1187,7 +1187,7 @@ string Evaluator::exprToString(shared_ptr<SExp> expr) {
         case SExpType::PAIR: {
             ss << "( ";
             
-            // ³B²z²Ä¤@­Ó¤¸¯À
+            // è™•ç†ç¬¬ä¸€å€‹å…ƒç´ 
             if (expr->car) {
                 if (expr->car->type == SExpType::SYMBOL) {
                     ss << expr->car->symbolVal;
@@ -1197,7 +1197,7 @@ string Evaluator::exprToString(shared_ptr<SExp> expr) {
                 }
             }
             
-            // ³B²z³Ñ¤U¤¸¯À
+            // è™•ç†å‰©ä¸‹å…ƒç´ 
             shared_ptr<SExp> rest = expr->cdr;
             while (rest && rest->type == SExpType::PAIR) {
                 ss << " ";
@@ -1208,7 +1208,7 @@ string Evaluator::exprToString(shared_ptr<SExp> expr) {
                 rest = rest->cdr;
             }
             
-            // ³B²zÂI¹ïªí¥Üªk
+            // è™•ç†é»å°è¡¨ç¤ºæ³•
             if (rest && rest->type != SExpType::NIL) {
                 ss << " . " << exprToString(rest);
             }
@@ -1217,11 +1217,11 @@ string Evaluator::exprToString(shared_ptr<SExp> expr) {
             return ss.str();
         }
         default:
-            return "­ì¯«±Ò°Ê";
+            return "åŸç¥å•Ÿå‹•";
     }
 }
 
-// ÀË¬d¬O§_¬°Primitive Function¦W
+// æª¢æŸ¥æ˜¯å¦ç‚ºPrimitive Functionå
 bool Evaluator::isPrimitive(string name) {    static const unordered_set<string> primitives = {
         "cons", "list", "car", "cdr", "atom?", "pair?", "list?", "null?",
         "integer?", "real?", "number?", "string?", "boolean?", "symbol?",
@@ -1237,17 +1237,17 @@ bool Evaluator::isPrimitive(string name) {    static const unordered_set<string>
     return primitives.find(name) != primitives.end();
 }
 
-// ªì©l¤Æ©Ò¦³Primitive Function, ³Q²M±¼«á·|¦A¦¸¥[¤J 
+// åˆå§‹åŒ–æ‰€æœ‰Primitive Function, è¢«æ¸…æ‰å¾Œæœƒå†æ¬¡åŠ å…¥ 
 void Evaluator::initPrimitives() {
-    // «Øºc¥\¯à 
+    // å»ºæ§‹åŠŸèƒ½ 
     environment["cons"] = make_shared<SExp>("cons", primitiveCons);
     environment["list"] = make_shared<SExp>("list", primitiveList);
     
-    // ¨ú­È¥\¯à
+    // å–å€¼åŠŸèƒ½
     environment["car"] = make_shared<SExp>("car", primitiveCar);
     environment["cdr"] = make_shared<SExp>("cdr", primitiveCdr);
     
-    // §PÂ_¥\¯à 
+    // åˆ¤æ–·åŠŸèƒ½ 
     environment["atom?"] = make_shared<SExp>("atom?", primitiveAtom);
     environment["pair?"] = make_shared<SExp>("pair?", primitivePair);
     environment["list?"] = make_shared<SExp>("list?", primitiveIsList);
@@ -1259,29 +1259,29 @@ void Evaluator::initPrimitives() {
     environment["boolean?"] = make_shared<SExp>("boolean?", primitiveBoolean);
     environment["symbol?"] = make_shared<SExp>("symbol?", primitiveSymbol);
     
-    // ¥|«h¹Bºâ 
+    // å››å‰‡é‹ç®— 
     environment["+"] = make_shared<SExp>("+", primitiveAdd);
     environment["-"] = make_shared<SExp>("-", primitiveSubtract);
     environment["*"] = make_shared<SExp>("*", primitiveMultiply);
     environment["/"] = make_shared<SExp>("/", primitiveDivide);
     
-    // ÀË¬d¥\¯à 
+    // æª¢æŸ¥åŠŸèƒ½ 
     environment["not"] = make_shared<SExp>("not", primitiveNot);
     
-    // ¤ñ¸û¥\¯à 
+    // æ¯”è¼ƒåŠŸèƒ½ 
     environment[">"] = make_shared<SExp>(">", primitiveGreater);
     environment[">="] = make_shared<SExp>(">=", primitiveGreaterEqual);
     environment["<"] = make_shared<SExp>("<", primitiveLess);
     environment["<="] = make_shared<SExp>("<=", primitiveLessEqual);
     environment["="] = make_shared<SExp>("=", primitiveNumEqual);
     
-    // ¦r¦ê¾Ş§@¥\¯à 
+    // å­—ä¸²æ“ä½œåŠŸèƒ½ 
     environment["string-append"] = make_shared<SExp>("string-append", primitiveStringAppend);
     environment["string>?"] = make_shared<SExp>("string>?", primitiveStringGreater);
     environment["string<?"] = make_shared<SExp>("string<?", primitiveStringLess);
     environment["string=?"] = make_shared<SExp>("string=?", primitiveStringEqual);
     
-    // ¬Ûµ¥´ú¸Õ
+    // ç›¸ç­‰æ¸¬è©¦
     environment["eqv?"] = make_shared<SExp>("eqv?", primitiveEqv);
     environment["equal?"] = make_shared<SExp>("equal?", primitiveEqual);
     
@@ -1304,26 +1304,26 @@ void Evaluator::initPrimitives() {
     
         shared_ptr<SExp> result;
     
-        // «O¦s·í«eªº top-level ª¬ºA
+        // ä¿å­˜ç•¶å‰çš„ top-level ç‹€æ…‹
         bool wasTopLevel = isTopLevel;
         
-        // eval ¥Îªºªí¹F¦¡À³¸Ó¦btop-level°õ¦æ
+        // eval ç”¨çš„è¡¨é”å¼æ‡‰è©²åœ¨top-levelåŸ·è¡Œ
         isTopLevel = true;
         
         bool success = this->EvalSExp(args[0], result);
     
-        // «ì´_ top-level
+        // æ¢å¾© top-level
         isTopLevel = wasTopLevel;
     
         if (!success) {
-            // ª½±µ¦^¶Ç¿ù»~¦Ó¤£¬O©ßerror (Á×§K¿ù»~¥]¸Ë) 
+            // ç›´æ¥å›å‚³éŒ¯èª¤è€Œä¸æ˜¯æ‹‹error (é¿å…éŒ¯èª¤åŒ…è£) 
             shared_ptr<SExp> errorObj = make_shared<SExp>();
             errorObj->type = SExpType::ERROR;
             errorObj->stringVal = this->getErrorMessage();
             return errorObj;
         }
         
-        // ¦pªGµ²ªG¬OSYSMES»İ¥ß§Y¦L 
+        // å¦‚æœçµæœæ˜¯SYSMESéœ€ç«‹å³å° 
         if (result && result->type == SExpType::SYSTEM_MESSAGE) {
             Printer printer;
             printer.print(result);
@@ -1333,7 +1333,7 @@ void Evaluator::initPrimitives() {
 		return result;
     });
     
-    // verbose (³´¨À) 
+    // verbose (é™·é˜±) 
     environment["verbose?"] = make_shared<SExp>("verbose?", [](vector<shared_ptr<SExp>>& args) -> shared_ptr<SExp> {
         checkArity("verbose?", args, 0);
         return verboseMode ? make_shared<SExp>(SExpType::T) : make_shared<SExp>(SExpType::NIL);
@@ -1346,19 +1346,19 @@ void Evaluator::initPrimitives() {
     });
 }
 
-// ¶}©l
+// é–‹å§‹
 bool Evaluator::EvalSExp(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
     if (!expr) {
         result = make_shared<SExp>(SExpType::NIL);
         return true;
     }
     
-    // ¦s·í«elevelª¬ºA
+    // å­˜ç•¶å‰levelç‹€æ…‹
     bool wasTopLevel = isTopLevel;
     bool res;
     bool currTopLevel;
     
-    // °£¤Ftop-level¥~¡A¨ä¥L³£³]¬°«Dtop-level(§ì¥X¦b¿ù»~level°õ¦æªº¥\¯à)
+    // é™¤äº†top-levelå¤–ï¼Œå…¶ä»–éƒ½è¨­ç‚ºétop-level(æŠ“å‡ºåœ¨éŒ¯èª¤levelåŸ·è¡Œçš„åŠŸèƒ½)
     if (!wasTopLevel) {
         isTopLevel = false;
     }
@@ -1370,34 +1370,34 @@ bool Evaluator::EvalSExp(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
         case SExpType::NIL:
         case SExpType::T:
         case SExpType::PRIMITIVE_PROC:
-            // ¦Û¨D­Èªí¹F¦¡
+            // è‡ªæ±‚å€¼è¡¨é”å¼
             result = expr;
-            isTopLevel = wasTopLevel;  // ÁÙ­ìtop-levelª¬ºA
+            isTopLevel = wasTopLevel;  // é‚„åŸtop-levelç‹€æ…‹
             return true;
             
         case SExpType::SYMBOL:
-            // ¬d²Å¸¹¸j©w
+            // æŸ¥ç¬¦è™Ÿç¶å®š
             res = evalSymbol(expr, result);
-            // ½T«O¹ï¥¼¸j©w²Å¸¹ªº¿ù»~³B²z¬O¥¿½Tªº
+            // ç¢ºä¿å°æœªç¶å®šç¬¦è™Ÿçš„éŒ¯èª¤è™•ç†æ˜¯æ­£ç¢ºçš„
             if (!res) {
-                // «O¯d­ì©lªº "unbound symbol" ¿ù»~°T®§
-                isTopLevel = wasTopLevel;  // ÁÙ­ìtop-levelª¬ºA
+                // ä¿ç•™åŸå§‹çš„ "unbound symbol" éŒ¯èª¤è¨Šæ¯
+                isTopLevel = wasTopLevel;  // é‚„åŸtop-levelç‹€æ…‹
                 return false;
             }
-            isTopLevel = wasTopLevel;  // ÁÙ­ìtop-levelª¬ºA
+            isTopLevel = wasTopLevel;  // é‚„åŸtop-levelç‹€æ…‹
             return res;
             
             
         case SExpType::PAIR:
-            // ¶i¤J«Dtop-level
+            // é€²å…¥étop-level
             currTopLevel = isTopLevel;
             isTopLevel = false;
             
-            // ÀË¬d¬O§_¬O¯S®í§Î¦¡
+            // æª¢æŸ¥æ˜¯å¦æ˜¯ç‰¹æ®Šå½¢å¼
             if (expr->car && expr->car->type == SExpType::SYMBOL) {
                 string op = expr->car->symbolVal;
                 if (op == "define" || op == "clean-environment" || op == "exit") { 
-                    if (!wasTopLevel) { // ¥X²{¦b¿ù»~level 
+                    if (!wasTopLevel) { // å‡ºç¾åœ¨éŒ¯èª¤level 
                         string upperOp;
                         if (op == "define") upperOp = "DEFINE";
                         else if (op == "clean-environment") upperOp = "CLEAN-ENVIRONMENT";
@@ -1405,23 +1405,23 @@ bool Evaluator::EvalSExp(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
                         
                         errorMessage = "ERROR (level of " + upperOp + ")";
                         hasError = true;
-                        isTopLevel = wasTopLevel;  // ÁÙ­ìtop-levelª¬ºA
+                        isTopLevel = wasTopLevel;  // é‚„åŸtop-levelç‹€æ…‹
                         return false;
                     }
                 }
             }
             
-            // µû¦ô¦Cªíªí¹F¦¡
+            // è©•ä¼°åˆ—è¡¨è¡¨é”å¼
             res = evalList(expr, result);
             //if (errorMessage.find("ERROR (no return piyan)") != string::npos) return true; 
-            //cout << "·F§A®Q" << errorMessage << endl; 
-            // ¦pªG¦b³»¼h¥Î¥¢±Ñ¥B¤£¬O¯S®í§Î¦¡, «h¿ù»~°T®§Âà´«¬° "no return value"
-            // ¦ı¤£­×§ï¤w¸g¬O¯S©wÃş«¬ªº¿ù»~°T®§
+            //cout << "å¹¹ä½ å¨˜" << errorMessage << endl; 
+            // å¦‚æœåœ¨é ‚å±¤ç”¨å¤±æ•—ä¸”ä¸æ˜¯ç‰¹æ®Šå½¢å¼, å‰‡éŒ¯èª¤è¨Šæ¯è½‰æ›ç‚º "no return value"
+            // ä½†ä¸ä¿®æ”¹å·²ç¶“æ˜¯ç‰¹å®šé¡å‹çš„éŒ¯èª¤è¨Šæ¯
             if (!res && currTopLevel && 
                 !(expr->car && expr->car->type == SExpType::SYMBOL && 
                   (expr->car->symbolVal == "define" || expr->car->symbolVal == "clean-environment" || expr->car->symbolVal == "exit"))) {
-                //cout << "·F§A®Q" << errorMessage << endl; 
-                // «O¯d¯S©wÃş«¬ªº¿ù»~
+                //cout << "å¹¹ä½ å¨˜" << errorMessage << endl; 
+                // ä¿ç•™ç‰¹å®šé¡å‹çš„éŒ¯èª¤
                 if (errorMessage.find("ERROR (unbound symbol)") != string::npos ||
                     errorMessage.find("ERROR (attempt to apply non-function)") != string::npos ||
                     errorMessage.find("ERROR (incorrect number of arguments)") != string::npos ||
@@ -1435,7 +1435,7 @@ bool Evaluator::EvalSExp(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
                     errorMessage.find("ERROR (* with incorrect argument type)") != string::npos ||  
                     errorMessage.find("ERROR (+ with incorrect argument type)") != string::npos) { 
                     
-                    // ¤£°µ¥ô¦ó­×§ï
+                    // ä¸åšä»»ä½•ä¿®æ”¹
                 }
 				else if (errorMessage.find("ERROR (no return piyan)") != string::npos){
 					string target = "ERROR (no return piyan)";
@@ -1456,16 +1456,16 @@ bool Evaluator::EvalSExp(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
 					errorMessage.replace(pos, target.length(), replacement);
 				} 
 				else {
-                    // ±N¨ä¥L¿ù»~Âà´«¬° "no return value"
+                    // å°‡å…¶ä»–éŒ¯èª¤è½‰æ›ç‚º "no return value"
                     errorMessage = "ERROR (no return value) : " + formatExprForError(expr) ;
                 }
             }
             
-            isTopLevel = currTopLevel;  // ÁÙ­ìtop-levelª¬ºA
+            isTopLevel = currTopLevel;  // é‚„åŸtop-levelç‹€æ…‹
             return res;
             
         default:
-            isTopLevel = wasTopLevel;  // ÁÙ­ìtop-levelª¬ºA
+            isTopLevel = wasTopLevel;  // é‚„åŸtop-levelç‹€æ…‹
             return false;
     }
 }
@@ -1485,15 +1485,15 @@ bool Evaluator::evalSymbol(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
 
 // List
 bool Evaluator::evalList(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
-    // step1 : ÀË¬dS-Exp¬O§_¬O¦³®ÄªºList 
+    // step1 : æª¢æŸ¥S-Expæ˜¯å¦æ˜¯æœ‰æ•ˆçš„List 
     if (expr->cdr && expr->cdr->type != SExpType::NIL) {
-        // ¹M¾úcdr½u, ½T«O³Ì«á¤@­Ócdr¬O NIL
+        // éæ­·cdrç·š, ç¢ºä¿æœ€å¾Œä¸€å€‹cdræ˜¯ NIL
         shared_ptr<SExp> current = expr->cdr;
         while (current->type == SExpType::PAIR) {
             current = current->cdr;
         }
         
-        // ¦pªG³Ì«á¤@­Ócdr¤£¬O NIL, ¨º¥Nªí³o¬O¤@­ÓÂI¹ïµ²ºc, ¤£¬O¦³®ÄList 
+        // å¦‚æœæœ€å¾Œä¸€å€‹cdrä¸æ˜¯ NIL, é‚£ä»£è¡¨é€™æ˜¯ä¸€å€‹é»å°çµæ§‹, ä¸æ˜¯æœ‰æ•ˆList 
         if (current->type != SExpType::NIL) {
             errorMessage = "ERROR (non-list) : " + formatExprForError(expr);
             hasError = true;
@@ -1501,17 +1501,17 @@ bool Evaluator::evalList(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
         }
     }
 
-    // step2 : S-Exp²Å¦XListµ²ºc«á¦A°µfunctionÀË¬d
+    // step2 : S-Expç¬¦åˆListçµæ§‹å¾Œå†åšfunctionæª¢æŸ¥
     if (!expr->car) {
         errorMessage = "ERROR (attempt to apply non-function) : " + formatExprForError(nullptr);
         hasError = true;
         return false;
     }
     
-    // step3 : ÀË¬d¬O§_¬O¯S®í§Î¦¡
+    // step3 : æª¢æŸ¥æ˜¯å¦æ˜¯ç‰¹æ®Šå½¢å¼
     if (expr->car->type == SExpType::SYMBOL) {
         string symbol = expr->car->symbolVal;
-        //cout << "·F§A®Q" << symbol << endl; 
+        //cout << "å¹¹ä½ å¨˜" << symbol << endl; 
         if (symbol == "quote") return evalQuote(expr, result);
         else if (symbol == "if") return evalIf(expr, result);
         else if (symbol == "cond") return evalCond(expr, result);
@@ -1526,16 +1526,16 @@ bool Evaluator::evalList(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
         else if (symbol == "set!") return evalSet(expr, result);
     }
     
-    // step4 : ¨D­È(¹ï²Ä¤@­Ó¤¸¯À¶i¦æ¨D­È)
+    // step4 : æ±‚å€¼(å°ç¬¬ä¸€å€‹å…ƒç´ é€²è¡Œæ±‚å€¼)
     shared_ptr<SExp> op;
     string funcName = "";
     
     if (expr->car->type == SExpType::SYMBOL) {
         funcName = expr->car->symbolVal;
         
-        // ÀË¬d¦³¨S¦³¦bÀô¹Ò¸Ì 
+        // æª¢æŸ¥æœ‰æ²’æœ‰åœ¨ç’°å¢ƒè£¡ 
         auto it = environment.find(expr->car->symbolVal);
-        if (it == environment.end()) { // ¥Nªí¨S³oªF¦è 
+        if (it == environment.end()) { // ä»£è¡¨æ²’é€™æ±è¥¿ 
             errorMessage = "ERROR (unbound symbol) : " + expr->car->symbolVal;
             hasError = true;
             return false;
@@ -1544,7 +1544,7 @@ bool Evaluator::evalList(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
         op = it->second;
     } 
     else {
-        // µû¦ô¹Bºâ²Åªí¹F¦¡
+        // è©•ä¼°é‹ç®—ç¬¦è¡¨é”å¼
         if (!EvalSExp(expr->car, op)) {
             errorMessage = "ERROR (no return piyan) : " + formatExprForError(expr->car);
             hasError = true;
@@ -1554,14 +1554,14 @@ bool Evaluator::evalList(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
         funcName = exprToString(expr->car);
     }
     
-    // step5 : ½T»{¨D­È«áªº²Ä¤@­Ó¤¸¯À¬O¤@­Ó¨ç¼Æ(­ì©l¨ç¼Æ©Î¥Î¤á©w¸q¨ç¼Æ)
+    // step5 : ç¢ºèªæ±‚å€¼å¾Œçš„ç¬¬ä¸€å€‹å…ƒç´ æ˜¯ä¸€å€‹å‡½æ•¸(åŸå§‹å‡½æ•¸æˆ–ç”¨æˆ¶å®šç¾©å‡½æ•¸)
     if (op->type != SExpType::PRIMITIVE_PROC && op->type != SExpType::USER_PROC) {
         errorMessage = "ERROR (attempt to apply non-function) : " + formatExprForError(op);
         hasError = true;
         return false;
     }
     
-    // step6 : °Ñ¼Æ¼Æ¶qÀË¬d(°w¹ï©Ò¦³¨ç¼ÆÃş«¬)
+    // step6 : åƒæ•¸æ•¸é‡æª¢æŸ¥(é‡å°æ‰€æœ‰å‡½æ•¸é¡å‹)
     int argCount = 0;
     shared_ptr<SExp> argCheck = expr->cdr;
     
@@ -1570,7 +1570,7 @@ bool Evaluator::evalList(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
         argCheck = argCheck->cdr;
     }
     
-    // ÀË¬d¥Î¤á©w¸q¨ç¼Æªº°Ñ¼Æ¼Æ¶q
+    // æª¢æŸ¥ç”¨æˆ¶å®šç¾©å‡½æ•¸çš„åƒæ•¸æ•¸é‡
     if (op->type == SExpType::USER_PROC) {
         if (argCount != op->params.size()) {
             errorMessage = "ERROR (incorrect number of arguments) : " + op->procName;
@@ -1579,7 +1579,7 @@ bool Evaluator::evalList(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
         }
     }
     
-    // ÀË¬d¤£¦P­ì©l¨ç¼Æ¹ïÀ³ªº°Ñ¼Æ¼Æ¶q¬O§_¥¿½T
+    // æª¢æŸ¥ä¸åŒåŸå§‹å‡½æ•¸å°æ‡‰çš„åƒæ•¸æ•¸é‡æ˜¯å¦æ­£ç¢º
     if (op->type == SExpType::PRIMITIVE_PROC) {
         if (op->procName == "pair?") {
             if (argCount != 1) {
@@ -1597,12 +1597,12 @@ bool Evaluator::evalList(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
         }
     }
     
-    // step7 : ½ü¨ì°Ñ¼Æ¨D­È 
+    // step7 : è¼ªåˆ°åƒæ•¸æ±‚å€¼ 
     vector<shared_ptr<SExp>> args;
     shared_ptr<SExp> argList = expr->cdr;
     
     while (argList && argList->type != SExpType::NIL) {
-        // ½T«O°Ñ¼Æ¦Cªí²Å¦XPAIRµ²ºc
+        // ç¢ºä¿åƒæ•¸åˆ—è¡¨ç¬¦åˆPAIRçµæ§‹
         if (argList->type != SExpType::PAIR) {
             errorMessage = "ERROR (non-list) : " + formatExprForError(expr);
             hasError = true;
@@ -1611,12 +1611,12 @@ bool Evaluator::evalList(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
         
         shared_ptr<SExp> argVal;
         bool oldTopLevel = isTopLevel;
-        isTopLevel = false; // ²{¦b¤£¦btop-level 
+        isTopLevel = false; // ç¾åœ¨ä¸åœ¨top-level 
         
         if (!EvalSExp(argList->car, argVal)) { 
-            // °Ñ¼Æ¨D­È¥¢±Ñ®Éªº³B²z
+            // åƒæ•¸æ±‚å€¼å¤±æ•—æ™‚çš„è™•ç†
             
-            // ¥ıÀË¬d¬O§_¬O­«­nªº¿ù»~Ãş«¬­nÀu¥ı«O¯d
+            // å…ˆæª¢æŸ¥æ˜¯å¦æ˜¯é‡è¦çš„éŒ¯èª¤é¡å‹è¦å„ªå…ˆä¿ç•™
             if (errorMessage.find("ERROR (incorrect number of arguments)") != string::npos ||
                 errorMessage.find("ERROR (attempt to apply non-function)") != string::npos ||
                 errorMessage.find("ERROR (car with incorrect argument type)") != string::npos ||
@@ -1645,26 +1645,26 @@ bool Evaluator::evalList(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
                 errorMessage.find("ERROR (no return piyan)") != string::npos ||
 				errorMessage.find("ERROR (unbound piyan)") != string::npos || 
 				errorMessage.find("ERROR (unbound papapa)") != string::npos ) {
-                // «O¯d¤£°µ¥ô¦ó­×§ï
+                // ä¿ç•™ä¸åšä»»ä½•ä¿®æ”¹
             }
-            // µM«áÀË¬d¬O§_¬O¥¼¸j©w²Å¸¹¿ù»~
+            // ç„¶å¾Œæª¢æŸ¥æ˜¯å¦æ˜¯æœªç¶å®šç¬¦è™ŸéŒ¯èª¤
             else if (errorMessage.find("ERROR (unbound symbol)") != string::npos) {
-                // «O¯d "unbound symbol" ¿ù»~
+                // ä¿ç•™ "unbound symbol" éŒ¯èª¤
             } 
-            // ±µµÛ³B²zºâ³N¹Bºâ¨ç¼Æªº°Ñ¼Æ¨D­È¥¢±Ñ
+            // æ¥è‘—è™•ç†ç®—è¡“é‹ç®—å‡½æ•¸çš„åƒæ•¸æ±‚å€¼å¤±æ•—
             else if (expr->car && expr->car->type == SExpType::SYMBOL && 
                 (expr->car->symbolVal == "+" || expr->car->symbolVal == "-" || 
                  expr->car->symbolVal == "*" || expr->car->symbolVal == "/")) {
-                // ¬Oºâ³N¹Bºâ¨ç¼Æªº°Ñ¼Æ¨D­È¥¢±Ñ±N¿ù»~Âà¬° "unbound parameter"
+                // æ˜¯ç®—è¡“é‹ç®—å‡½æ•¸çš„åƒæ•¸æ±‚å€¼å¤±æ•—å°‡éŒ¯èª¤è½‰ç‚º "unbound parameter"
                 errorMessage = "ERROR (unbound piyan) : " + formatExprForError(argList->car);
             }
-            // ³Ì«á³B²z "no return value" ¿ù»~
+            // æœ€å¾Œè™•ç† "no return value" éŒ¯èª¤
             else if (errorMessage.find("ERROR (no return value)") != string::npos) {
-                //  "no return value" ¿ù»~Âà¬° "unbound parameter"
+                //  "no return value" éŒ¯èª¤è½‰ç‚º "unbound parameter"
                 errorMessage = "ERROR (unbound papapa) : " + formatExprForError(argList->car);
             }
             else {
-                // ¨ä¥L±¡ªpÂà¬° "unbound parameter"
+                // å…¶ä»–æƒ…æ³è½‰ç‚º "unbound parameter"
                 errorMessage = "ERROR (unbound parameter) : " + formatExprForError(argList->car);
             }
             
@@ -1675,68 +1675,68 @@ bool Evaluator::evalList(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
         
         isTopLevel = oldTopLevel;
         
-        args.push_back(argVal); // §â¨C­Ó°Ñ¼Æ¨D­È«áªºµ²ªG¦s°_¨Ó 
-        argList = argList->cdr; // ¤U­±¤@¦ì 
+        args.push_back(argVal); // æŠŠæ¯å€‹åƒæ•¸æ±‚å€¼å¾Œçš„çµæœå­˜èµ·ä¾† 
+        argList = argList->cdr; // ä¸‹é¢ä¸€ä½ 
     }
-      // step8 : ¨S³ø¿ùªº¸Ü·|¦³¦U°Ñ¼Æ°õ¦æµ²ªG 
+      // step8 : æ²’å ±éŒ¯çš„è©±æœƒæœ‰å„åƒæ•¸åŸ·è¡Œçµæœ 
     try {
-        // ³B²z­ì©l¨ç¼Æ
+        // è™•ç†åŸå§‹å‡½æ•¸
         if (op->type == SExpType::PRIMITIVE_PROC) {
             result = op->procValue(args);
             return true;
         }
-        // ³B²z¥Î¤á©w¸q¨ç¼Æ
+        // è™•ç†ç”¨æˆ¶å®šç¾©å‡½æ•¸
         else if (op->type == SExpType::USER_PROC) {
-            // «O¦s·í«eÀô¹Ò
+            // ä¿å­˜ç•¶å‰ç’°å¢ƒ
             
             auto oldEnv = environment;
             
-            // ³Ğ·sÀô¹Ò®Ú¾Ú¨ç¼ÆÃş«¬¦Ó©w
+            // å‰µæ–°ç’°å¢ƒæ ¹æ“šå‡½æ•¸é¡å‹è€Œå®š
             unordered_map<string, shared_ptr<SExp>> newEnv;
             
             if (op->env == nullptr) {
-                // Lambda¡G¥Î·í«eªºÀô¹Ò
+                // Lambdaï¼šç”¨ç•¶å‰çš„ç’°å¢ƒ
                 
                 newEnv = environment;
             }            
             else {
 			
-                // ´¶³quser©w¸q¨ç¼Æ¡G¥Î¨ç¼Æ©w¸q®ÉªºÀô¹Ò§@¬°°òÂ¦
+                // æ™®é€šuserå®šç¾©å‡½æ•¸ï¼šç”¨å‡½æ•¸å®šç¾©æ™‚çš„ç’°å¢ƒä½œç‚ºåŸºç¤
                 newEnv = *(op->env);
                 
-                // ±N·í«eÀô¹Ò¤¤·s©w¸qªº¨ç¼Æ©MÅÜ¼Æ¦X¨Ö¶i¨Ó
-                // ³o¼Ë¦b let ©w¸qªº§½³¡ÅÜ¼Æ©M¥~¼h·s©w¸qªº¨ç¼Æ³£¯à¬İ¨ì 
+                // å°‡ç•¶å‰ç’°å¢ƒä¸­æ–°å®šç¾©çš„å‡½æ•¸å’Œè®Šæ•¸åˆä½µé€²ä¾†
+                // é€™æ¨£åœ¨ let å®šç¾©çš„å±€éƒ¨è®Šæ•¸å’Œå¤–å±¤æ–°å®šç¾©çš„å‡½æ•¸éƒ½èƒ½çœ‹åˆ° 
                 for (auto pair : environment) {
-                    // ÀË¬d¬O§_¬O¨ç¼Æ©w¸q®É¤£¦s¦bªº·s¶µ¥Ø
+                    // æª¢æŸ¥æ˜¯å¦æ˜¯å‡½æ•¸å®šç¾©æ™‚ä¸å­˜åœ¨çš„æ–°é …ç›®
                     if (op->env->find(pair.first) == op->env->end()) {
-                        // ·s©w¸qªº¨ç¼Æ©ÎÅÜ¼Æ¥[¨ìÀô¹Ò¤¤
+                        // æ–°å®šç¾©çš„å‡½æ•¸æˆ–è®Šæ•¸åŠ åˆ°ç’°å¢ƒä¸­
                         newEnv[pair.first] = pair.second;
                     }
-                    // ¦pªG¬O let ³ĞªºÁ{®ÉÅÜ¼Æ¤]­nÂĞ»\­ì¦³ªº
+                    // å¦‚æœæ˜¯ let å‰µçš„è‡¨æ™‚è®Šæ•¸ä¹Ÿè¦è¦†è“‹åŸæœ‰çš„
                     else if (pair.second.get() != op->env->at(pair.first).get()) {
-                        // ·sªº¸j©wÀ³¥Î·sªº­È
+                        // æ–°çš„ç¶å®šæ‡‰ç”¨æ–°çš„å€¼
                         newEnv[pair.first] = pair.second;
                     }
                 }
             }
             
-            // ¸j©w°Ñ¼Æ¨ì·sÀô¹Ò
+            // ç¶å®šåƒæ•¸åˆ°æ–°ç’°å¢ƒ
             for (int i = 0; i < op->params.size(); i++) {
                 newEnv[op->params[i]] = args[i];
             }
             
-            // ¨Ï¥Î·sÀô¹Ò
+            // ä½¿ç”¨æ–°ç’°å¢ƒ
             environment = newEnv;
             
-            // °õ¦æ¨ç¼ÆÅé¡]·Ó begin¡^
+            // åŸ·è¡Œå‡½æ•¸é«”ï¼ˆç…§ beginï¼‰
             shared_ptr<SExp> currentResult;
             bool success = true;
               for (int i = 0; i < op->body.size(); i++) {
                 bool isLastExpr = (i == op->body.size() - 1);
                 if (EvalSExp(op->body[i], currentResult)) {
-                    // °õ¦æ¦¨¥\ÀË¬d¬O§_¬OSYSMES 
+                    // åŸ·è¡ŒæˆåŠŸæª¢æŸ¥æ˜¯å¦æ˜¯SYSMES 
                     if (currentResult && currentResult->type == SExpType::SYSTEM_MESSAGE) {
-                        // SYSMES»İ¦L¡]°£«D¬O³Ì«á¤@­Óªí¹F¦¡¡^
+                        // SYSMESéœ€å°ï¼ˆé™¤éæ˜¯æœ€å¾Œä¸€å€‹è¡¨é”å¼ï¼‰
                         if (!isLastExpr) {
                             Printer printer;
                             printer.print(currentResult);
@@ -1776,7 +1776,7 @@ bool Evaluator::evalList(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
                     }
                 }
             }
-              // ¥u«ì´_¨ç¼Æ°Ñ¼Æ («O¯d set! ©M define ªº®ÄªG) 
+              // åªæ¢å¾©å‡½æ•¸åƒæ•¸ (ä¿ç•™ set! å’Œ define çš„æ•ˆæœ) 
             for (string param : op->params) {
                 if (oldEnv.find(param) != oldEnv.end()) {
                     environment[param] = oldEnv[param];
@@ -1805,38 +1805,38 @@ bool Evaluator::evalList(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
         return false;
     }
     
-    // ¦pªG¨ì³o«hªí¥Ü¦³ÅŞ¿è¿ù»~
+    // å¦‚æœåˆ°é€™å‰‡è¡¨ç¤ºæœ‰é‚è¼¯éŒ¯èª¤
     return false;
 }
 
 // quote
 bool Evaluator::evalQuote(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
-    // ÀË¬d°Ñ¼Æ¼Æ¶q
+    // æª¢æŸ¥åƒæ•¸æ•¸é‡
     if (!expr->cdr || expr->cdr->type != SExpType::PAIR || !expr->cdr->car || expr->cdr->cdr->type != SExpType::NIL) {
         errorMessage = "ERROR (incorrect number of arguments) : quote";
         hasError = true;
         return false;
     }
     
-    // ª½±µreturn¥¼§PÂ_ªº°Ñ¼Æ
+    // ç›´æ¥returnæœªåˆ¤æ–·çš„åƒæ•¸
     result = expr->cdr->car;
     return true;
 }
 
 // define
 bool Evaluator::evalDefine(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
-    // ÀË¬d°Ñ¼Æ¼Æ¶q
+    // æª¢æŸ¥åƒæ•¸æ•¸é‡
     if (!expr->cdr || expr->cdr->type != SExpType::PAIR) {
         errorMessage = "ERROR (DEFINE format) : " + formatExprForError(expr);
         hasError = true;
         return false;
     }
     
-    // ÀË¬d©w¸qÃş«¬
+    // æª¢æŸ¥å®šç¾©é¡å‹
     if (expr->cdr->car->type == SExpType::SYMBOL) {
-        // »yªk: (define ²Å¸¹ ­È)
+        // èªæ³•: (define ç¬¦è™Ÿ å€¼)
         
-        // ÀË¬d»yªk
+        // æª¢æŸ¥èªæ³•
         if (!expr->cdr->cdr || expr->cdr->cdr->type != SExpType::PAIR || 
             !expr->cdr->cdr->car || expr->cdr->cdr->cdr->type != SExpType::NIL) {
             errorMessage = "ERROR (DEFINE format) : " + formatExprForError(expr);
@@ -1846,14 +1846,14 @@ bool Evaluator::evalDefine(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
    
         string symbol = expr->cdr->car->symbolVal;
         
-        // ÀË¬d¬O§_¬°«O¯d¦r
+        // æª¢æŸ¥æ˜¯å¦ç‚ºä¿ç•™å­—
         if (isPrimitive(symbol)) {
             errorMessage = "ERROR (DEFINE format) : " + formatExprForError(expr);
             hasError = true;
             return false;
         }
         
-        // ¨D­È
+        // æ±‚å€¼
         shared_ptr<SExp> value;
         if (!EvalSExp(expr->cdr->cdr->car, value)) {
         	if (errorMessage.find("ERROR (unbound papapa)") != string::npos){
@@ -1867,15 +1867,15 @@ bool Evaluator::evalDefine(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
         	errorMessage = "ERROR (no return value) : " + formatExprForError(expr->cdr->cdr->car);
             return false;
         }
-        // ¥[¨ìÀô¹Ò
+        // åŠ åˆ°ç’°å¢ƒ
         environment[symbol] = value;
         
         result = createSystemMessage(symbol + " defined");
         return true;
     }
     else if (expr->cdr->car->type == SExpType::PAIR) {
-        // »yªk: (define (¨ç¼Æ¦W °Ñ¼Æ...) ¨ç¼ÆÅé...)
-        // ÀË¬d¨ç¼Æ¦W¬O§_¬O²Å¸¹
+        // èªæ³•: (define (å‡½æ•¸å åƒæ•¸...) å‡½æ•¸é«”...)
+        // æª¢æŸ¥å‡½æ•¸åæ˜¯å¦æ˜¯ç¬¦è™Ÿ
         if (!expr->cdr->car->car || expr->cdr->car->car->type != SExpType::SYMBOL) {
             errorMessage = "ERROR (DEFINE format) : " + formatExprForError(expr);
             hasError = true;
@@ -1884,14 +1884,14 @@ bool Evaluator::evalDefine(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
         
         string funcName = expr->cdr->car->car->symbolVal;
         
-        // ÀË¬d¬O§_¬°«O¯d¦r
+        // æª¢æŸ¥æ˜¯å¦ç‚ºä¿ç•™å­—
         if (isPrimitive(funcName)) {
             errorMessage = "ERROR (DEFINE format) : " + formatExprForError(expr);
             hasError = true;
             return false;
         }
         
-        // ¦¬¶°°Ñ¼Æ
+        // æ”¶é›†åƒæ•¸
         vector<string> params;
         shared_ptr<SExp> paramsList = expr->cdr->car->cdr;
         while (paramsList && paramsList->type == SExpType::PAIR) {
@@ -1905,21 +1905,21 @@ bool Evaluator::evalDefine(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
             paramsList = paramsList->cdr;
         }
         
-        // ½T«O°Ñ¼Æ¦Cªíµ²§À¬O nil
+        // ç¢ºä¿åƒæ•¸åˆ—è¡¨çµå°¾æ˜¯ nil
         if (paramsList && paramsList->type != SExpType::NIL) {
             errorMessage = "ERROR (DEFINE format) : " + formatExprForError(expr);
             hasError = true;
             return false;
         }
         
-        // ÀË¬d¨ç¼ÆÅé
+        // æª¢æŸ¥å‡½æ•¸é«”
         if (!expr->cdr->cdr || expr->cdr->cdr->type == SExpType::NIL) {
             errorMessage = "ERROR (DEFINE format) : " + formatExprForError(expr);
             hasError = true;
             return false;
         }
         
-        // ¦¬¶°¨ç¼ÆÅé
+        // æ”¶é›†å‡½æ•¸é«”
         vector<shared_ptr<SExp>> body;
         shared_ptr<SExp> bodyList = expr->cdr->cdr;
         while (bodyList && bodyList->type == SExpType::PAIR) {
@@ -1927,22 +1927,22 @@ bool Evaluator::evalDefine(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
             bodyList = bodyList->cdr;
         }
         
-        // ½T«O¨ç¼ÆÅé¦Cªíµ²§À¬O nil
+        // ç¢ºä¿å‡½æ•¸é«”åˆ—è¡¨çµå°¾æ˜¯ nil
         if (bodyList && bodyList->type != SExpType::NIL) {
             errorMessage = "ERROR (DEFINE format) : " + formatExprForError(expr);
             hasError = true;
             return false;
         }
         
-        // ³ĞÀô¹Ò°Æ¥»
+        // å‰µç’°å¢ƒå‰¯æœ¬
         shared_ptr<unordered_map<string, shared_ptr<SExp>>> envCopy = make_shared<unordered_map<string, shared_ptr<SExp>>>(environment);
         
-        // ³Ğ¨ç¼Æ¹ï¶H
+        // å‰µå‡½æ•¸å°è±¡
         shared_ptr<SExp> funcObj = make_shared<SExp>(params, body, envCopy);
         funcObj->type = SExpType::USER_PROC;
         funcObj->procName = funcName;
         
-        // ¥[¨ìÀô¹Ò
+        // åŠ åˆ°ç’°å¢ƒ
         environment[funcName] = funcObj;
         
         result = createSystemMessage(funcName + " defined");
@@ -1956,16 +1956,16 @@ bool Evaluator::evalDefine(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
 }
 
 bool Evaluator::evalLambda(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
-    // »yªk: (lambda (°Ñ¼Æ¦Cªí) ¨ç¼ÆÅé...)
+    // èªæ³•: (lambda (åƒæ•¸åˆ—è¡¨) å‡½æ•¸é«”...)
     
-    // step1 : ÀË¬d°Ñ¼Æ³¡¤À
+    // step1 : æª¢æŸ¥åƒæ•¸éƒ¨åˆ†
     if (!expr->cdr || expr->cdr->type != SExpType::PAIR) {
         errorMessage = "ERROR (LAMBDA format) : " + formatExprForError(expr);
         hasError = true;
         return false;
     }
     
-    // step2 : ÀË¬d°Ñ¼Æ¦Cªí®æ¦¡
+    // step2 : æª¢æŸ¥åƒæ•¸åˆ—è¡¨æ ¼å¼
     shared_ptr<SExp> paramsList = expr->cdr->car;
     if (paramsList->type != SExpType::PAIR && paramsList->type != SExpType::NIL) {
         errorMessage = "ERROR (LAMBDA format) : " + formatExprForError(expr);
@@ -1973,7 +1973,7 @@ bool Evaluator::evalLambda(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
         return false;
     }
     
-    // step3 : ¦¬¶°°Ñ¼Æ¦W
+    // step3 : æ”¶é›†åƒæ•¸å
     vector<string> params;
     shared_ptr<SExp> current = paramsList;
     while (current && current->type == SExpType::PAIR) {
@@ -1987,14 +1987,14 @@ bool Evaluator::evalLambda(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
         current = current->cdr;
     }
     
-    // ½T«O°Ñ¼Æ¦Cªíµ²§À¬O nil
+    // ç¢ºä¿åƒæ•¸åˆ—è¡¨çµå°¾æ˜¯ nil
     if (current && current->type != SExpType::NIL) {
         errorMessage = "ERROR (LAMBDA format) : " + formatExprForError(expr);
         hasError = true;
         return false;
     }
     
-    // step4 : ÀË¬d¨ç¼ÆÅé
+    // step4 : æª¢æŸ¥å‡½æ•¸é«”
     shared_ptr<SExp> bodyList = expr->cdr->cdr;
     if (!bodyList || bodyList->type == SExpType::NIL) {
         errorMessage = "ERROR (LAMBDA format) : " + formatExprForError(expr);
@@ -2002,7 +2002,7 @@ bool Evaluator::evalLambda(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
         return false;
     }
     
-    // step5 : ¦¬¶°¨ç¼ÆÅéªí¹F¦¡
+    // step5 : æ”¶é›†å‡½æ•¸é«”è¡¨é”å¼
     vector<shared_ptr<SExp>> body;
     current = bodyList;
     while (current && current->type == SExpType::PAIR) {
@@ -2010,28 +2010,28 @@ bool Evaluator::evalLambda(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
         current = current->cdr;
     }
     
-    // ½T«O¨ç¼ÆÅé¦Cªíµ²§À¬O nil
+    // ç¢ºä¿å‡½æ•¸é«”åˆ—è¡¨çµå°¾æ˜¯ nil
     if (current && current->type != SExpType::NIL) {
         errorMessage = "ERROR (LAMBDA format) : " + formatExprForError(expr);
         hasError = true;
         return false;
     }
     
-    // step6 : ¤£¦b©w¸q®É®·ÀòÀô¹Ò¦Ó¬O¶Ç nullptr
-    // Lambda ¦b³Q¥Î®É¤~·|®·Àò·í®ÉªºÀô¹Ò
+    // step6 : ä¸åœ¨å®šç¾©æ™‚æ•ç²ç’°å¢ƒè€Œæ˜¯å‚³ nullptr
+    // Lambda åœ¨è¢«ç”¨æ™‚æ‰æœƒæ•ç²ç•¶æ™‚çš„ç’°å¢ƒ
     shared_ptr<unordered_map<string, shared_ptr<SExp>>> envCopy = nullptr;
     
-    // step7 : ³Ğ lambda ¨ç¼Æ¹ï¶H
+    // step7 : å‰µ lambda å‡½æ•¸å°è±¡
     result = make_shared<SExp>(params, body, envCopy);
-    result->procName = "lambda"; // ¥Î©óÅã¥Ü
+    result->procName = "lambda"; // ç”¨æ–¼é¡¯ç¤º
     
     return true;
 }
 
 bool Evaluator::evalLet(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
-    // »yªk: (let ((ÅÜ¶q1 ­È1) (ÅÜ¶q2 ­È2)...) ªí¹F¦¡...)
+    // èªæ³•: (let ((è®Šé‡1 å€¼1) (è®Šé‡2 å€¼2)...) è¡¨é”å¼...)
     
-    // step1 : ÀË¬d¦³ÅÜ¶q¸j©w©M¦Ü¤Ö¤@­Óªí¹F¦¡
+    // step1 : æª¢æŸ¥æœ‰è®Šé‡ç¶å®šå’Œè‡³å°‘ä¸€å€‹è¡¨é”å¼
     if (!expr->cdr || expr->cdr->type != SExpType::PAIR || 
         !expr->cdr->cdr || expr->cdr->cdr->type == SExpType::NIL) {
         errorMessage = "ERROR (LET format) : " + formatExprForError(expr);
@@ -2039,7 +2039,7 @@ bool Evaluator::evalLet(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
         return false;
     }
     
-    // step2 : ¸j©w¦Cªí¥²¶·¬O PAIR or NIL
+    // step2 : ç¶å®šåˆ—è¡¨å¿…é ˆæ˜¯ PAIR or NIL
     shared_ptr<SExp> bindingsList = expr->cdr->car;
     if (bindingsList->type != SExpType::PAIR && bindingsList->type != SExpType::NIL) {
         errorMessage = "ERROR (LET format) : " + formatExprForError(expr);
@@ -2047,27 +2047,27 @@ bool Evaluator::evalLet(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
         return false;
     }
     
-    // step3 : ¥ıÀË¬d©Ò¦³¸j©wªº®æ¦¡¤£¨D­È
+    // step3 : å…ˆæª¢æŸ¥æ‰€æœ‰ç¶å®šçš„æ ¼å¼ä¸æ±‚å€¼
     shared_ptr<SExp> current = bindingsList;
     while (current && current->type == SExpType::PAIR) {
-        // ¨C­Ó¸j©w¥²¶·¬O PAIR Ãş«¬
+        // æ¯å€‹ç¶å®šå¿…é ˆæ˜¯ PAIR é¡å‹
         if (current->car->type != SExpType::PAIR) {
             errorMessage = "ERROR (LET format) : " + formatExprForError(expr);
             hasError = true;
             return false;
         }
-          // ¸j©wªº²Ä¤@­Ó¤¸¯À¥²¶·¬O²Å¸¹
+          // ç¶å®šçš„ç¬¬ä¸€å€‹å…ƒç´ å¿…é ˆæ˜¯ç¬¦è™Ÿ
         if (!current->car->car || current->car->car->type != SExpType::SYMBOL) {
             errorMessage = "ERROR (LET format) : " + formatExprForError(expr);
             hasError = true;
             return false;
         }
-          // ÀË¬dÅÜ¼Æ¦W¬O§_¬O¤º«Ø¨ç¼Æ¦W¡]¯S®íÀË¬d¡^
+          // æª¢æŸ¥è®Šæ•¸åæ˜¯å¦æ˜¯å…§å»ºå‡½æ•¸åï¼ˆç‰¹æ®Šæª¢æŸ¥ï¼‰
         string varName = current->car->car->symbolVal;
         if (environment.find(varName) != environment.end() && environment[varName]->type == SExpType::PRIMITIVE_PROC) {
-            // ¦pªG¹Á¸Õ¸j©w¤º«Ø¨ç¼Æ¦W¦³¥i¯à®æ¦¡¿ù»~
-            // !!!¬İ°_¨Ó¹³¨ç¼Æ½Õ¥Î®É!!!
-			// ¾Ş ª¯ªF¦è 
+            // å¦‚æœå˜—è©¦ç¶å®šå…§å»ºå‡½æ•¸åæœ‰å¯èƒ½æ ¼å¼éŒ¯èª¤
+            // !!!çœ‹èµ·ä¾†åƒå‡½æ•¸èª¿ç”¨æ™‚!!!
+			// æ“ ç‹—æ±è¥¿ 
             if (current->car->cdr && current->car->cdr->type == SExpType::PAIR &&
                 current->car->cdr->car && current->car->cdr->car->type == SExpType::SYMBOL) {
                 errorMessage = "ERROR (LET format) : " + formatExprForError(expr);
@@ -2076,21 +2076,21 @@ bool Evaluator::evalLet(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
             }
         }
         
-        // ¸j©w¥²¶·¦³­È³¡¤À
+        // ç¶å®šå¿…é ˆæœ‰å€¼éƒ¨åˆ†
         if (!current->car->cdr || current->car->cdr->type != SExpType::PAIR) {
             errorMessage = "ERROR (LET format) : " + formatExprForError(expr);
             hasError = true;
             return false;
         }
         
-        // ¸j©wªº­È¤§«á¥²¶·¬O NIL¡]½T«O¨C­Ó¸j©w¥u¦³ÅÜ¶q¦W©M¤@­Ó­È¡^
+        // ç¶å®šçš„å€¼ä¹‹å¾Œå¿…é ˆæ˜¯ NILï¼ˆç¢ºä¿æ¯å€‹ç¶å®šåªæœ‰è®Šé‡åå’Œä¸€å€‹å€¼ï¼‰
         if (current->car->cdr->cdr && current->car->cdr->cdr->type != SExpType::NIL) {
             errorMessage = "ERROR (LET format) : " + formatExprForError(expr);
             hasError = true;
             return false;
         }
         
-        // ÀË¬d¬O§_¦³­È¡]¨¾¤î¥u¦³ÅÜ¶q¦W¨S¦³­Èªº±¡ªp¡^
+        // æª¢æŸ¥æ˜¯å¦æœ‰å€¼ï¼ˆé˜²æ­¢åªæœ‰è®Šé‡åæ²’æœ‰å€¼çš„æƒ…æ³ï¼‰
         if (!current->car->cdr->car) {
             errorMessage = "ERROR (LET format) : " + formatExprForError(expr);
             hasError = true;
@@ -2100,25 +2100,25 @@ bool Evaluator::evalLet(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
         current = current->cdr;
     }
     
-    // ½T«O¸j©w¦Cªíµ²§À¬O nil
+    // ç¢ºä¿ç¶å®šåˆ—è¡¨çµå°¾æ˜¯ nil
     if (current && current->type != SExpType::NIL) {
         errorMessage = "ERROR (LET format) : " + formatExprForError(expr);
         hasError = true;
         return false;
     }    
 	
-	// step4 : ¥ı¦b­ìÀô¹Òºâ©Ò¦³¸j©wªº­È
+	// step4 : å…ˆåœ¨åŸç’°å¢ƒç®—æ‰€æœ‰ç¶å®šçš„å€¼
     vector<pair<string, shared_ptr<SExp>>> bindings;
     current = bindingsList;
     
     while (current && current->type == SExpType::PAIR) {
-        // ¨úÅÜ¶q¦W
+        // å–è®Šé‡å
         string varName = current->car->car->symbolVal;
         
-        // ¦b­ìÀô¹Ò¤¤¨D­È©Ò¦³¸j©wªº­È
+        // åœ¨åŸç’°å¢ƒä¸­æ±‚å€¼æ‰€æœ‰ç¶å®šçš„å€¼
         shared_ptr<SExp> value;
         bool oldTopLevel = isTopLevel;
-        isTopLevel = false; // let ¸j©w¨D­È¤£¦b³»¼h
+        isTopLevel = false; // let ç¶å®šæ±‚å€¼ä¸åœ¨é ‚å±¤
         
         if (!EvalSExp(current->car->cdr->car, value)) {
             isTopLevel = oldTopLevel;
@@ -2127,23 +2127,23 @@ bool Evaluator::evalLet(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
         
         isTopLevel = oldTopLevel;
         
-        // «O¦s¸j©w¦ıÁÙ¤£¥[¨ìÀô¹Ò¤¤
+        // ä¿å­˜ç¶å®šä½†é‚„ä¸åŠ åˆ°ç’°å¢ƒä¸­
         bindings.push_back(make_pair(varName, value));
         
         current = current->cdr;
     }
     
-    // step5 : ³Ğ·sÀô¹Ò¥u¦s°Ï°ì¸j©wªºÅÜ¼Æ¦W
+    // step5 : å‰µæ–°ç’°å¢ƒåªå­˜å€åŸŸç¶å®šçš„è®Šæ•¸å
     auto oldEnv = environment;
     vector<string> localVars;
     
-    // ±N©Ò¦³­pºâ¦nªº¸j©w¥[¨ìÀô¹Ò¤¤¨Ã°O¿ı°Ï°ìÅÜ¼Æ
+    // å°‡æ‰€æœ‰è¨ˆç®—å¥½çš„ç¶å®šåŠ åˆ°ç’°å¢ƒä¸­ä¸¦è¨˜éŒ„å€åŸŸè®Šæ•¸
     for (auto binding : bindings) {
         localVars.push_back(binding.first);
         environment[binding.first] = binding.second;
     }    
 	
-	// step6 : °õ¦æ let ¥DÅé
+	// step6 : åŸ·è¡Œ let ä¸»é«”
     shared_ptr<SExp> body = expr->cdr->cdr;
     shared_ptr<SExp> lastResult;
     bool success = true;
@@ -2152,13 +2152,13 @@ bool Evaluator::evalLet(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
         bool isLastExpr = (body->cdr == nullptr || body->cdr->type == SExpType::NIL);
         
         if (EvalSExp(body->car, lastResult)) {
-            // ¦¨¥\°õ¦æ
+            // æˆåŠŸåŸ·è¡Œ
             if (isLastExpr) {
                 result = lastResult;
             }        
 		} 
 		else {
-            // °õ¦æ¥¢±Ñ«ì´_°Ï°ìÅÜ¼Æ¦ı«O¯d set! ©M define ³]ªº¥ş°ìÅÜ¼Æ
+            // åŸ·è¡Œå¤±æ•—æ¢å¾©å€åŸŸè®Šæ•¸ä½†ä¿ç•™ set! å’Œ define è¨­çš„å…¨åŸŸè®Šæ•¸
             for (string varName : localVars) {
                 if (oldEnv.find(varName) != oldEnv.end()) {
                     environment[varName] = oldEnv[varName];
@@ -2174,7 +2174,7 @@ bool Evaluator::evalLet(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
         body = body->cdr;
     }    
 	
-	// ¥u«ì´_ let ¸j©wªº°Ï°ìÅÜ¼Æ («O¯d¨ä¥LÅÜ§ó) 
+	// åªæ¢å¾© let ç¶å®šçš„å€åŸŸè®Šæ•¸ (ä¿ç•™å…¶ä»–è®Šæ›´) 
     for (string varName : localVars) {
         if (oldEnv.find(varName) != oldEnv.end()) {
             environment[varName] = oldEnv[varName];
@@ -2184,10 +2184,10 @@ bool Evaluator::evalLet(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
         }
     }
     
-    /* ¤£¥Î«ì´_¨ä¥LÅÜ¼Æ­ì¦]¡G
-     1. define ³Ğªº¨ç¼ÆÀ³«O¯d¦b¥ş°ìÀô¹Ò
-     2. set! ³]ªºÅÜ¼ÆÀ³¸Ó«O¯d¦b¥ş°ìÀô¹Ò
-     3. ¥u¦³ let ¸j©wªº°Ï°ìÅÜ¼Æ»İ³Q«ì´_
+    /* ä¸ç”¨æ¢å¾©å…¶ä»–è®Šæ•¸åŸå› ï¼š
+     1. define å‰µçš„å‡½æ•¸æ‡‰ä¿ç•™åœ¨å…¨åŸŸç’°å¢ƒ
+     2. set! è¨­çš„è®Šæ•¸æ‡‰è©²ä¿ç•™åœ¨å…¨åŸŸç’°å¢ƒ
+     3. åªæœ‰ let ç¶å®šçš„å€åŸŸè®Šæ•¸éœ€è¢«æ¢å¾©
     */ 
     
     return success;
@@ -2195,20 +2195,20 @@ bool Evaluator::evalLet(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
 
 // if
 bool Evaluator::evalIf(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
-    // ÀË¬d°Ñ¼Æ
+    // æª¢æŸ¥åƒæ•¸
     shared_ptr<SExp> args = expr->cdr;
     
-    // step1 : ÀË¬d°Ñ¼Æ¼Æ¶q¬O§_¦b¤¹³\½d³ò¤º
+    // step1 : æª¢æŸ¥åƒæ•¸æ•¸é‡æ˜¯å¦åœ¨å…è¨±ç¯„åœå…§
     if (!args || args->type != SExpType::PAIR || !args->cdr || args->cdr->type != SExpType::PAIR) {
         errorMessage = "ERROR (incorrect number of arguments) : if";
         hasError = true;
         return false;
     }
     
-    // step2 : ÀË¬d±ø¥ó©M«á¤è¦¡¤l«á¬O§_³Ì¦h¥u¦³¤@­Ó(°°)else¦¡¤l 
+    // step2 : æª¢æŸ¥æ¢ä»¶å’Œå¾Œæ–¹å¼å­å¾Œæ˜¯å¦æœ€å¤šåªæœ‰ä¸€å€‹(å½)elseå¼å­ 
     shared_ptr<SExp> elseBranch = args->cdr->cdr;
     if (elseBranch && elseBranch->type == SExpType::PAIR) {
-        // ÀË¬delse¦¡¤l¤§«á¬O§_ÁÙ¦³§ó¦h°Ñ¼Æ
+        // æª¢æŸ¥elseå¼å­ä¹‹å¾Œæ˜¯å¦é‚„æœ‰æ›´å¤šåƒæ•¸
         if (elseBranch->cdr && elseBranch->cdr->type != SExpType::NIL) {
             errorMessage = "ERROR (incorrect number of arguments) : if";
             hasError = true;
@@ -2216,7 +2216,7 @@ bool Evaluator::evalIf(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
         }
     }
     
-    // step3 : §PÂ_±ø¥ó¯u°° 
+    // step3 : åˆ¤æ–·æ¢ä»¶çœŸå½ 
     shared_ptr<SExp> conditionExpr = args->car;
     shared_ptr<SExp> condition;
     
@@ -2224,21 +2224,21 @@ bool Evaluator::evalIf(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
         return false;
     }
     
-    // step4 : ®Ú¾Ú±ø¥óªºµ²ªG¿ï¦¡¤l°µ 
-    // «Dnil¡]«D#f¡^ = true (#t)
-    if (condition->type != SExpType::NIL) { // ±ø¥ó(#t) 
-        return EvalSExp(args->cdr->car, result); // °µ¦¡¤l1 
+    // step4 : æ ¹æ“šæ¢ä»¶çš„çµæœé¸å¼å­åš 
+    // énilï¼ˆé#fï¼‰ = true (#t)
+    if (condition->type != SExpType::NIL) { // æ¢ä»¶(#t) 
+        return EvalSExp(args->cdr->car, result); // åšå¼å­1 
     } 
-	else { // ±ø¥ó(#f) 
-        // ¥ıÀË¬d¬O§_¦³(°°)else¦¡¤l 
+	else { // æ¢ä»¶(#f) 
+        // å…ˆæª¢æŸ¥æ˜¯å¦æœ‰(å½)elseå¼å­ 
         if (!elseBranch || elseBranch->type == SExpType::NIL) {
-            // ¨S¦³else¦¡¤l¥Nªí¾ã­Óifªºµ²ªG¬Onil 
+            // æ²’æœ‰elseå¼å­ä»£è¡¨æ•´å€‹ifçš„çµæœæ˜¯nil 
             errorMessage = "ERROR (no return value) : " + formatExprForError(expr);
             hasError = true;
             return false;
         }
         
-        return EvalSExp(elseBranch->car, result); // // °µ¦¡¤l2(else³¡¤À) 
+        return EvalSExp(elseBranch->car, result); // // åšå¼å­2(elseéƒ¨åˆ†) 
     }
     
     //cout << "Hello world" << endl;
@@ -2254,11 +2254,11 @@ bool Evaluator::evalCond(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
         return false;
     }
     
-    // ³B²z¨C­Ó¤l¥y
+    // è™•ç†æ¯å€‹å­å¥
     while (clauses && clauses->type == SExpType::PAIR) {
         shared_ptr<SExp> clause = clauses->car;
         
-        // ÀË¬d±ø¥ó¤À¤ä®æ¦¡
+        // æª¢æŸ¥æ¢ä»¶åˆ†æ”¯æ ¼å¼
         if (!clause || clause->type != SExpType::PAIR) {
             errorMessage = "ERROR (COND format) : " + formatExprForError(expr);
             hasError = true;
@@ -2267,7 +2267,7 @@ bool Evaluator::evalCond(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
         
         shared_ptr<SExp> testResult;
         
-        // ³B²zelse
+        // è™•ç†else
         if (clause->car->type == SExpType::SYMBOL && clause->car->symbolVal == "else" && clauses->cdr->type == SExpType::NIL) {   
             testResult = make_shared<SExp>(SExpType::T);
         } 
@@ -2277,32 +2277,32 @@ bool Evaluator::evalCond(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
             }
         }
         
-        // °õ¦æ¤l¥yÅé¡]·Ó begin ÅŞ¿è¡^
+        // åŸ·è¡Œå­å¥é«”ï¼ˆç…§ begin é‚è¼¯ï¼‰
         if (testResult->type != SExpType::NIL) {
             shared_ptr<SExp> bodyExpr = clause->cdr;
             
-            // ¦pªG¨S¦³¤l¥yÅé´NÀË¬d®æ¦¡
+            // å¦‚æœæ²’æœ‰å­å¥é«”å°±æª¢æŸ¥æ ¼å¼
             if (!bodyExpr || bodyExpr->type == SExpType::NIL) {
                 errorMessage = "ERROR (COND format) : " + formatExprForError(expr);
                 hasError = true;
                 return false;
             }
             
-            // °õ¦æ¤l¥yÅé¡]·Ó begin ÅŞ¿è¡^
+            // åŸ·è¡Œå­å¥é«”ï¼ˆç…§ begin é‚è¼¯ï¼‰
             shared_ptr<SExp> currentResult;
             
             while (bodyExpr && bodyExpr->type == SExpType::PAIR) {
-                // ­«¸m¿ù»~ª¬ºA
+                // é‡ç½®éŒ¯èª¤ç‹€æ…‹
                 resetError();
                 
                 if (EvalSExp(bodyExpr->car, currentResult)) {
-                    // ¦¨¥\°õ¦æ
+                    // æˆåŠŸåŸ·è¡Œ
                     result = currentResult;
                 } 
 				else {
-                    // °õ¦æ¥¢±Ñ´NÀË¬d¿ù»~Ãş«¬
+                    // åŸ·è¡Œå¤±æ•—å°±æª¢æŸ¥éŒ¯èª¤é¡å‹
                     
-                    // ÀË¬d¬O§_­n¥ß§Y¤¤Â_
+                    // æª¢æŸ¥æ˜¯å¦è¦ç«‹å³ä¸­æ–·
                     if (errorMessage.find("ERROR (unbound symbol)") != string::npos ||
                         errorMessage.find("ERROR (attempt to apply non-function)") != string::npos ||
                         errorMessage.find("ERROR (incorrect number of arguments)") != string::npos ||
@@ -2317,18 +2317,18 @@ bool Evaluator::evalCond(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
                         errorMessage.find("ERROR (unbound parameter)") != string::npos ||
                         errorMessage.find("ERROR (unbound test-condition)") != string::npos ||
                         errorMessage.find("ERROR (unbound condition)") != string::npos) {
-                        // ¥ß§Y¤¤Â_
+                        // ç«‹å³ä¸­æ–·
                         hasError = true;
                         return false;
                     }
                     
-                    // ¦pªG¬O "no return value" ´NÀË¬d¬O§_¬°³Ì«á¤@­Óªí¹F¦¡
+                    // å¦‚æœæ˜¯ "no return value" å°±æª¢æŸ¥æ˜¯å¦ç‚ºæœ€å¾Œä¸€å€‹è¡¨é”å¼
                     if (bodyExpr->cdr && bodyExpr->cdr->type != SExpType::NIL) {
-                        // ¤£¬O³Ì«á¤@­Óªí¹F¦¡´NÄ~Äò°õ¦æ¤U¤@­Ó
+                        // ä¸æ˜¯æœ€å¾Œä¸€å€‹è¡¨é”å¼å°±ç¹¼çºŒåŸ·è¡Œä¸‹ä¸€å€‹
                         resetError();
                     } 
 					else {
-                        // ¬O³Ì«á¤@­Óªí¹F¦¡¥B¨S¦³ªğ¦^­È¥Nªí¥ş¿ù 
+                        // æ˜¯æœ€å¾Œä¸€å€‹è¡¨é”å¼ä¸”æ²’æœ‰è¿”å›å€¼ä»£è¡¨å…¨éŒ¯ 
                         errorMessage = "ERROR (no return value) : " + formatExprForError(expr);
                         hasError = true;
                         return false;
@@ -2344,14 +2344,14 @@ bool Evaluator::evalCond(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
                 }
             }
             
-            // ¦pªG¯à°õ¦æ¨ì³o¸Ì¥Nªí©Ò¦³ªí¹F¦¡³£¦¨¥\°õ¦æ¤F
+            // å¦‚æœèƒ½åŸ·è¡Œåˆ°é€™è£¡ä»£è¡¨æ‰€æœ‰è¡¨é”å¼éƒ½æˆåŠŸåŸ·è¡Œäº†
             return true;
         }
         
         clauses = clauses->cdr;
     }
     
-    // ©Ò¦³¤l¥y³£¬°°²
+    // æ‰€æœ‰å­å¥éƒ½ç‚ºå‡
     errorMessage = "ERROR (no return value) : " + formatExprForError(expr);
     hasError = true;
     return false;
@@ -2359,16 +2359,16 @@ bool Evaluator::evalCond(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
 
 // and
 bool Evaluator::evalAnd(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
-    shared_ptr<SExp> args = expr->cdr; // ¨úand«á¤è°Ñ¼Æ 
+    shared_ptr<SExp> args = expr->cdr; // å–andå¾Œæ–¹åƒæ•¸ 
     
-    // ¨S¦³°Ñ¼Æ®Éªğ¦^ #f(³o¸Ì·|Ãz±¼)
+    // æ²’æœ‰åƒæ•¸æ™‚è¿”å› #f(é€™è£¡æœƒçˆ†æ‰)
     if (!args || args->type == SExpType::NIL) {
         errorMessage = "ERROR (incorrect number of arguments) : and";
         hasError = true;
         return false;
     }
     
-    // ÀË¬d¨C­Ó°Ñ¼Æ, µo²{#f´N°± 
+    // æª¢æŸ¥æ¯å€‹åƒæ•¸, ç™¼ç¾#få°±åœ 
     while (args && args->type != SExpType::NIL) {
         if (args->type != SExpType::PAIR) {
             errorMessage = "ERROR (non-list) : " + formatExprForError(expr);
@@ -2377,7 +2377,7 @@ bool Evaluator::evalAnd(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
         }
         
         if (!EvalSExp(args->car, result)) {
-            // ¦pªG¬Oifªí¹F¦¡ªº±ø¥ó°õ¦æ¥¢±Ñ«hÅã¥Üunbound condition¿ù»~
+            // å¦‚æœæ˜¯ifè¡¨é”å¼çš„æ¢ä»¶åŸ·è¡Œå¤±æ•—å‰‡é¡¯ç¤ºunbound conditionéŒ¯èª¤
             if (args->car->type == SExpType::PAIR && args->car->car && 
                 args->car->car->type == SExpType::SYMBOL && args->car->car->symbolVal == "if") {
                 errorMessage = "ERROR (unbound condition) : " + formatExprForError(args->car);
@@ -2386,16 +2386,16 @@ bool Evaluator::evalAnd(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
             return false;
         }
         
-        // ÀË¬dµ²ªG 
+        // æª¢æŸ¥çµæœ 
         if (result->type == SExpType::NIL) {
             return true;
         }
         
-        // ´«¤U¤@­Ó°Ñ¼Æ
+        // æ›ä¸‹ä¸€å€‹åƒæ•¸
         args = args->cdr;
     }
     
-    // ©Ò¦³°Ñ¼Æ¬Ò#t
+    // æ‰€æœ‰åƒæ•¸çš†#t
     return true;
 }
 
@@ -2403,14 +2403,14 @@ bool Evaluator::evalAnd(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
 bool Evaluator::evalOr(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
     shared_ptr<SExp> args = expr->cdr;
     
-    // ¨S¦³°Ñ¼Æ®Éªğ¦^ #f(³o¸Ì·|Ãz±¼)
+    // æ²’æœ‰åƒæ•¸æ™‚è¿”å› #f(é€™è£¡æœƒçˆ†æ‰)
     if (!args || args->type == SExpType::NIL) {
         errorMessage = "ERROR (incorrect number of arguments) : or";
         hasError = true;
         return false;
     }
     
-    // ÀË¬d¨C­Ó°Ñ¼Æ, µo²{#t´N°± 
+    // æª¢æŸ¥æ¯å€‹åƒæ•¸, ç™¼ç¾#tå°±åœ 
     while (args && args->type != SExpType::NIL) {
         if (args->type != SExpType::PAIR) {
             errorMessage = "ERROR (non-list) : " + formatExprForError(expr);
@@ -2422,16 +2422,16 @@ bool Evaluator::evalOr(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
             return false;
         }
         
-        // ÀË¬dµ²ªG
+        // æª¢æŸ¥çµæœ
         if (result->type != SExpType::NIL) {
             return true;
         }
         
-        // ´«¤U¤@­Ó°Ñ¼Æ
+        // æ›ä¸‹ä¸€å€‹åƒæ•¸
         args = args->cdr;
     }
     
-    // ©Ò¦³°Ñ¼Æ¬Ò#f
+    // æ‰€æœ‰åƒæ•¸çš†#f
     result = make_shared<SExp>(SExpType::NIL);
     return true;
 }
@@ -2440,7 +2440,7 @@ bool Evaluator::evalOr(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
 bool Evaluator::evalBegin(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
     shared_ptr<SExp> args = expr->cdr;
     
-    // ¨S¦³°Ñ¼Æ®Éªğ¦^¿ù»~
+    // æ²’æœ‰åƒæ•¸æ™‚è¿”å›éŒ¯èª¤
     if (!args || args->type == SExpType::NIL) {
         errorMessage = "ERROR (incorrect number of arguments) : begin";
         hasError = true;
@@ -2449,7 +2449,7 @@ bool Evaluator::evalBegin(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
     
     shared_ptr<SExp> currentResult;
     
-    // ¨Ì§Ç°õ¦æ©Ò¦³ªí¹F¦¡
+    // ä¾åºåŸ·è¡Œæ‰€æœ‰è¡¨é”å¼
     while (args && args->type != SExpType::NIL) {
         if (args->type != SExpType::PAIR) {
             errorMessage = "ERROR (non-list) : " + formatExprForError(expr);
@@ -2457,25 +2457,25 @@ bool Evaluator::evalBegin(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
             return false;
         }
         
-        // ÀË¬d¬O§_¬°³Ì«á¤@­Óªí¹F¦¡
+        // æª¢æŸ¥æ˜¯å¦ç‚ºæœ€å¾Œä¸€å€‹è¡¨é”å¼
         bool isLastExpr = (args->cdr == nullptr || args->cdr->type == SExpType::NIL);
         
-        // ­«¸m¿ù»~ª¬ºA
+        // é‡ç½®éŒ¯èª¤ç‹€æ…‹
         resetError();
         
         if (EvalSExp(args->car, currentResult)) {
-            // ¦¨¥\°õ¦æ
+            // æˆåŠŸåŸ·è¡Œ
             if (isLastExpr) {
-                // ¦pªG¬O³Ì«á¤@­Óªí¹F¦¡¥B¦¨¥\  
+                // å¦‚æœæ˜¯æœ€å¾Œä¸€å€‹è¡¨é”å¼ä¸”æˆåŠŸ  
                 result = currentResult;
                 return true;
             }
-            // ¦pªG¤£¬O³Ì«á¤@­Óªí¹F¦¡´NÄ~Äò°õ¦æ¤U¤@­Ó
+            // å¦‚æœä¸æ˜¯æœ€å¾Œä¸€å€‹è¡¨é”å¼å°±ç¹¼çºŒåŸ·è¡Œä¸‹ä¸€å€‹
         } 
 		else {
-            // °õ¦æ¥¢±Ñ¡AÀË¬d¿ù»~Ãş«¬
-            //cout << "·F§A®Q" <<  errorMessage << endl; 
-            // ÀË¬d¬O§_»İ¥ß§Y¤¤Â_
+            // åŸ·è¡Œå¤±æ•—ï¼Œæª¢æŸ¥éŒ¯èª¤é¡å‹
+            //cout << "å¹¹ä½ å¨˜" <<  errorMessage << endl; 
+            // æª¢æŸ¥æ˜¯å¦éœ€ç«‹å³ä¸­æ–·
             if (errorMessage.find("ERROR (unbound symbol)") != string::npos ||
                 errorMessage.find("ERROR (attempt to apply non-function)") != string::npos ||
                 errorMessage.find("ERROR (incorrect number of arguments)") != string::npos ||
@@ -2490,28 +2490,28 @@ bool Evaluator::evalBegin(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
                 errorMessage.find("ERROR (unbound parameter)") != string::npos ||
                 errorMessage.find("ERROR (unbound test-condition)") != string::npos ||
                 errorMessage.find("ERROR (unbound condition)") != string::npos) {
-                // ¥ß§Y¤¤Â_
+                // ç«‹å³ä¸­æ–·
                 hasError = true;
                 return false;
             }
             
-            // ¦pªG¬O "no return value" ¿ù»~
+            // å¦‚æœæ˜¯ "no return value" éŒ¯èª¤
             if (isLastExpr) {
-            	//cout << "·F§A®Q" << errorMessage << endl;
-                // ¦pªG¬O³Ì«á¤@­Óªí¹F¦¡¥¢±Ñ¥Nªí¥ş¿ù 
+            	//cout << "å¹¹ä½ å¨˜" << errorMessage << endl;
+                // å¦‚æœæ˜¯æœ€å¾Œä¸€å€‹è¡¨é”å¼å¤±æ•—ä»£è¡¨å…¨éŒ¯ 
                 errorMessage = "ERROR (no return value) : " + formatExprForError(expr);
                 hasError = true;
                 return false;
             }
-            // ¦pªG¤£¬O³Ì«á¤@­Óªí¹F¦¡´N©¿²¤ "no return value" Ä~Äò°õ¦æ¤U¤@­Óªí¹F¦¡
+            // å¦‚æœä¸æ˜¯æœ€å¾Œä¸€å€‹è¡¨é”å¼å°±å¿½ç•¥ "no return value" ç¹¼çºŒåŸ·è¡Œä¸‹ä¸€å€‹è¡¨é”å¼
             resetError();
         }
         
-        // ´«¤U¤@­Óªí¹F¦¡
+        // æ›ä¸‹ä¸€å€‹è¡¨é”å¼
         args = args->cdr;
     }
     
-    // ¦pªG¨ì¹F³o¸Ì¥Nªí¨S¦³ªí¹F¦¡³Q°õ¦æ¡]²z½×¤W¤£·|µo¥Í¡^
+    // å¦‚æœåˆ°é”é€™è£¡ä»£è¡¨æ²’æœ‰è¡¨é”å¼è¢«åŸ·è¡Œï¼ˆç†è«–ä¸Šä¸æœƒç™¼ç”Ÿï¼‰
     errorMessage = "ERROR (no return value) : " + formatExprForError(expr);
     hasError = true;
     return false;
@@ -2519,23 +2519,23 @@ bool Evaluator::evalBegin(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
 
 // clean-environment
 bool Evaluator::evalCleanEnv(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
-    // ÀË¬d«á¤è¤£¥i¦³°Ñ¼Æ
+    // æª¢æŸ¥å¾Œæ–¹ä¸å¯æœ‰åƒæ•¸
     if (expr->cdr && expr->cdr->type != SExpType::NIL) {
         errorMessage = "ERROR (incorrect number of arguments) : clean-environment";
         hasError = true;
         return false;
     }
     
-    // ²M°_¨Ó 
+    // æ¸…èµ·ä¾† 
     cleanEnvironment();
     
     result = createSystemMessage("environment cleaned");
     return true;
 }
 
-// exit(¥u¬O®³¨ÓÀË¬derror¥Î) 
+// exit(åªæ˜¯æ‹¿ä¾†æª¢æŸ¥errorç”¨) 
 bool Evaluator::evalExit(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
-    // ÀË¬d«á¤è¤£¥i¦³°Ñ¼Æ
+    // æª¢æŸ¥å¾Œæ–¹ä¸å¯æœ‰åƒæ•¸
     if (expr->cdr && expr->cdr->type != SExpType::NIL) {
         errorMessage = "ERROR (incorrect number of arguments) : exit";
         hasError = true;
@@ -2546,7 +2546,7 @@ bool Evaluator::evalExit(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
     return true;
 }
 
-// ÀË¬d¬O§_¬O¦Cªí
+// æª¢æŸ¥æ˜¯å¦æ˜¯åˆ—è¡¨
 bool Evaluator::isList(shared_ptr<SExp> expr) {
     if (expr->type == SExpType::NIL) return true;
     if (expr->type != SExpType::PAIR) return false;
@@ -2559,7 +2559,7 @@ bool Evaluator::isList(shared_ptr<SExp> expr) {
     return ptr->type == SExpType::NIL;
 }
 
-// ²M°_¨Ó 
+// æ¸…èµ·ä¾† 
 void Evaluator::cleanEnvironment() {
     environment.clear();
     initPrimitives();
@@ -2570,18 +2570,18 @@ string Evaluator::getErrorMessage() {
     return errorMessage;
 }
 
-// ÀË¬d¬O§_¦³error
+// æª¢æŸ¥æ˜¯å¦æœ‰error
 bool Evaluator::hasEncounteredError() {
     return hasError;
 }
 
-// ­«¸merror messageª¬ºA
+// é‡ç½®error messageç‹€æ…‹
 void Evaluator::resetError() {
     hasError = false;
     errorMessage = "";
 }
 
-// ÀË¬d°Ñ¼Æ¼Æ¶q¥Î 
+// æª¢æŸ¥åƒæ•¸æ•¸é‡ç”¨ 
 void Evaluator::checkArity(string name, vector<shared_ptr<SExp>> args, int expected, bool exact) {
     if ((exact && args.size() != expected) || (!exact && args.size() < expected)) {
         throw EvalError("incorrect number of arguments", name);
@@ -2601,17 +2601,17 @@ double Evaluator::getNumber(shared_ptr<SExp> arg, string funcName) {
     }
 }
 
-// ¤ñ¸û¨â­ÓS-Exp¬O§_¬Ûµ¥¡]¥Î©óequal?¡^
+// æ¯”è¼ƒå…©å€‹S-Expæ˜¯å¦ç›¸ç­‰ï¼ˆç”¨æ–¼equal?ï¼‰
 bool Evaluator::isEqual(shared_ptr<SExp> a, shared_ptr<SExp> b) {
-	// ¦pªG¨â­Ó³£¬Onullptrµø¬°¬Ûµ¥
-    // ¦pªG¥u¦³¤@­Ó¬Onullptr«hªÖ©w¤£¬Ûµ¥
+	// å¦‚æœå…©å€‹éƒ½æ˜¯nullptrè¦–ç‚ºç›¸ç­‰
+    // å¦‚æœåªæœ‰ä¸€å€‹æ˜¯nullptrå‰‡è‚¯å®šä¸ç›¸ç­‰
     if (!a && !b) return true;
     if (!a || !b) return false;
     
-    // ¥ıÀË¬dÃş«¬
+    // å…ˆæª¢æŸ¥é¡å‹
     if (a->type != b->type) return false;
     
-    // ¦A®Ú¾ÚÃş«¬¤ñ¸û
+    // å†æ ¹æ“šé¡å‹æ¯”è¼ƒ
     switch (a->type) {
         case SExpType::INT:
             return a->intVal == b->intVal;
@@ -2635,7 +2635,7 @@ bool Evaluator::isEqual(shared_ptr<SExp> a, shared_ptr<SExp> b) {
 
 // cons
 shared_ptr<SExp> Evaluator::primitiveCons(vector<shared_ptr<SExp>>& args) {
-    checkArity("cons", args, 2); // ½T«O°Ñ¼Æ¼Æ¶q
+    checkArity("cons", args, 2); // ç¢ºä¿åƒæ•¸æ•¸é‡
     return make_shared<SExp>(args[0], args[1]);
 }
 
@@ -2643,7 +2643,7 @@ shared_ptr<SExp> Evaluator::primitiveCons(vector<shared_ptr<SExp>>& args) {
 shared_ptr<SExp> Evaluator::primitiveList(vector<shared_ptr<SExp>>& args) {
     shared_ptr<SExp> result = make_shared<SExp>(SExpType::NIL);
     
-    // ±q³Ì«á¤@­Ó°Ñ¼Æ¶}©l©¹«e³B²z(¬°¤Fºc«Ø¥¿½T¶¶§Çªº¦Cªí, Â²ºÙ«á¤J¦¡)
+    // å¾æœ€å¾Œä¸€å€‹åƒæ•¸é–‹å§‹å¾€å‰è™•ç†(ç‚ºäº†æ§‹å»ºæ­£ç¢ºé †åºçš„åˆ—è¡¨, ç°¡ç¨±å¾Œå…¥å¼)
     for (int i = args.size() - 1; i >= 0; i--) {
         result = make_shared<SExp>(args[i], result);
     }
@@ -2653,7 +2653,7 @@ shared_ptr<SExp> Evaluator::primitiveList(vector<shared_ptr<SExp>>& args) {
 
 // car
 shared_ptr<SExp> Evaluator::primitiveCar(vector<shared_ptr<SExp>>& args) {
-    checkArity("car", args, 1); // ½T«O°Ñ¼Æ¼Æ¶q
+    checkArity("car", args, 1); // ç¢ºä¿åƒæ•¸æ•¸é‡
     
     if (args[0]->type != SExpType::PAIR) {
         string errorValue;
@@ -2698,7 +2698,7 @@ shared_ptr<SExp> Evaluator::primitiveCar(vector<shared_ptr<SExp>>& args) {
 
 // cdr
 shared_ptr<SExp> Evaluator::primitiveCdr(vector<shared_ptr<SExp>>& args) {
-    checkArity("cdr", args, 1); // ½T«O°Ñ¼Æ¼Æ¶q 
+    checkArity("cdr", args, 1); // ç¢ºä¿åƒæ•¸æ•¸é‡ 
     
     if (args[0]->type != SExpType::PAIR) {
         string errorValue;
@@ -2741,25 +2741,25 @@ shared_ptr<SExp> Evaluator::primitiveCdr(vector<shared_ptr<SExp>>& args) {
     return args[0]->cdr;
 }
 
-// atom¶Ü 
+// atomå— 
 shared_ptr<SExp> Evaluator::primitiveAtom(vector<shared_ptr<SExp>>& args) {
-    checkArity("atom?", args, 1); // ½T«O°Ñ¼Æ¼Æ¶q  
+    checkArity("atom?", args, 1); // ç¢ºä¿åƒæ•¸æ•¸é‡  
     
     bool isAtom = (args[0]->type != SExpType::PAIR);
     return isAtom ? make_shared<SExp>(SExpType::T) : make_shared<SExp>(SExpType::NIL);
 }
 
-// pair¶Ü 
+// pairå— 
 shared_ptr<SExp> Evaluator::primitivePair(vector<shared_ptr<SExp>>& args) {
-    checkArity("pair?", args, 1); // ½T«O°Ñ¼Æ¼Æ¶q  
+    checkArity("pair?", args, 1); // ç¢ºä¿åƒæ•¸æ•¸é‡  
     
     bool isPair = (args[0]->type == SExpType::PAIR);
     return isPair ? make_shared<SExp>(SExpType::T) : make_shared<SExp>(SExpType::NIL);
 }
 
-// list¶Ü 
+// listå— 
 shared_ptr<SExp> Evaluator::primitiveIsList(vector<shared_ptr<SExp>>& args) {
-    checkArity("list?", args, 1); // ½T«O°Ñ¼Æ¼Æ¶q  
+    checkArity("list?", args, 1); // ç¢ºä¿åƒæ•¸æ•¸é‡  
     
     if (args[0]->type == SExpType::NIL) {
         return make_shared<SExp>(SExpType::T);
@@ -2769,19 +2769,19 @@ shared_ptr<SExp> Evaluator::primitiveIsList(vector<shared_ptr<SExp>>& args) {
         return make_shared<SExp>(SExpType::NIL);
     }
     
-    // ÀË¬d¬O§_¬°¥¿½Tªº¦Cªíµ²ºc
+    // æª¢æŸ¥æ˜¯å¦ç‚ºæ­£ç¢ºçš„åˆ—è¡¨çµæ§‹
     shared_ptr<SExp> ptr = args[0];
     while (ptr->type == SExpType::PAIR) {
         ptr = ptr->cdr;
     }
     
-    bool isList = (ptr->type == SExpType::NIL); // ÁY¤@¤Uµ{¦¡½X 
+    bool isList = (ptr->type == SExpType::NIL); // ç¸®ä¸€ä¸‹ç¨‹å¼ç¢¼ 
     return isList ? make_shared<SExp>(SExpType::T) : make_shared<SExp>(SExpType::NIL);
 }
 
-// null¶Ü 
+// nullå— 
 shared_ptr<SExp> Evaluator::primitiveNull(vector<shared_ptr<SExp>>& args) {
-    checkArity("null?", args, 1); // ½T«O°Ñ¼Æ¼Æ¶q  
+    checkArity("null?", args, 1); // ç¢ºä¿åƒæ•¸æ•¸é‡  
     
     bool isNull = (args[0]->type == SExpType::NIL);
     return isNull ? make_shared<SExp>(SExpType::T) : make_shared<SExp>(SExpType::NIL);
@@ -2789,7 +2789,7 @@ shared_ptr<SExp> Evaluator::primitiveNull(vector<shared_ptr<SExp>>& args) {
 
 // integer?
 shared_ptr<SExp> Evaluator::primitiveInteger(vector<shared_ptr<SExp>>& args) {
-    checkArity("integer?", args, 1); // ½T«O°Ñ¼Æ¼Æ¶q  
+    checkArity("integer?", args, 1); // ç¢ºä¿åƒæ•¸æ•¸é‡  
     
     bool isInteger = (args[0]->type == SExpType::INT);
     return isInteger ? make_shared<SExp>(SExpType::T) : make_shared<SExp>(SExpType::NIL);
@@ -2797,16 +2797,16 @@ shared_ptr<SExp> Evaluator::primitiveInteger(vector<shared_ptr<SExp>>& args) {
 
 // real?
 shared_ptr<SExp> Evaluator::primitiveReal(vector<shared_ptr<SExp>>& args) {
-    checkArity("real?", args, 1); // ½T«O°Ñ¼Æ¼Æ¶q  
+    checkArity("real?", args, 1); // ç¢ºä¿åƒæ•¸æ•¸é‡  
     
-    // ª`·N : INT©MFLOAT³£¬O¹ê¼Æ
+    // æ³¨æ„ : INTå’ŒFLOATéƒ½æ˜¯å¯¦æ•¸
     bool isReal = (args[0]->type == SExpType::FLOAT || args[0]->type == SExpType::INT);
     return isReal ? make_shared<SExp>(SExpType::T) : make_shared<SExp>(SExpType::NIL);
 }
 
 // number?
 shared_ptr<SExp> Evaluator::primitiveNumber(vector<shared_ptr<SExp>>& args) {
-    checkArity("number?", args, 1); // ½T«O°Ñ¼Æ¼Æ¶q  
+    checkArity("number?", args, 1); // ç¢ºä¿åƒæ•¸æ•¸é‡  
     
     bool isNumber = (args[0]->type == SExpType::INT || args[0]->type == SExpType::FLOAT);
     return isNumber ? make_shared<SExp>(SExpType::T) : make_shared<SExp>(SExpType::NIL);
@@ -2814,7 +2814,7 @@ shared_ptr<SExp> Evaluator::primitiveNumber(vector<shared_ptr<SExp>>& args) {
 
 // string?
 shared_ptr<SExp> Evaluator::primitiveString(vector<shared_ptr<SExp>>& args) {
-    checkArity("string?", args, 1); // ½T«O°Ñ¼Æ¼Æ¶q  
+    checkArity("string?", args, 1); // ç¢ºä¿åƒæ•¸æ•¸é‡  
     
     bool isString = (args[0]->type == SExpType::STRING);
     return isString ? make_shared<SExp>(SExpType::T) : make_shared<SExp>(SExpType::NIL);
@@ -2822,7 +2822,7 @@ shared_ptr<SExp> Evaluator::primitiveString(vector<shared_ptr<SExp>>& args) {
 
 // boolean?
 shared_ptr<SExp> Evaluator::primitiveBoolean(vector<shared_ptr<SExp>>& args) {
-    checkArity("boolean?", args, 1); // ½T«O°Ñ¼Æ¼Æ¶q  
+    checkArity("boolean?", args, 1); // ç¢ºä¿åƒæ•¸æ•¸é‡  
     
     bool isBoolean = (args[0]->type == SExpType::T || args[0]->type == SExpType::NIL);
     return isBoolean ? make_shared<SExp>(SExpType::T) : make_shared<SExp>(SExpType::NIL);
@@ -2830,7 +2830,7 @@ shared_ptr<SExp> Evaluator::primitiveBoolean(vector<shared_ptr<SExp>>& args) {
 
 // symbol?
 shared_ptr<SExp> Evaluator::primitiveSymbol(vector<shared_ptr<SExp>>& args) {
-    checkArity("symbol?", args, 1); // ½T«O°Ñ¼Æ¼Æ¶q  
+    checkArity("symbol?", args, 1); // ç¢ºä¿åƒæ•¸æ•¸é‡  
     
     bool isSymbol = (args[0]->type == SExpType::SYMBOL);
     return isSymbol ? make_shared<SExp>(SExpType::T) : make_shared<SExp>(SExpType::NIL);
@@ -2838,7 +2838,7 @@ shared_ptr<SExp> Evaluator::primitiveSymbol(vector<shared_ptr<SExp>>& args) {
 
 // +
 shared_ptr<SExp> Evaluator::primitiveAdd(vector<shared_ptr<SExp>>& args) {
-	// ÀË¬d°Ñ¼Æ¼Æ¶q
+	// æª¢æŸ¥åƒæ•¸æ•¸é‡
     if (args.size() < 2) {   
         throw EvalError("incorrect number of arguments", "+");
     }
@@ -2847,7 +2847,7 @@ shared_ptr<SExp> Evaluator::primitiveAdd(vector<shared_ptr<SExp>>& args) {
     int intResult = 0;
     double floatResult = 0.0;
     
-    // ª`·N¯BÂI¾ğ¤¤³~¬ğµM¥X²{ 
+    // æ³¨æ„æµ®é»æ¨¹ä¸­é€”çªç„¶å‡ºç¾ 
     for (auto arg : args) {
         if (arg->type == SExpType::FLOAT) {
             if (!hasFloat) {
@@ -2865,8 +2865,8 @@ shared_ptr<SExp> Evaluator::primitiveAdd(vector<shared_ptr<SExp>>& args) {
                 intResult = intResult + arg->intVal;
             }
         } 
-		else { // ³£¤£¬O 
-            // ´£¨Ñ¿ù»~°Ñ¼Æ
+		else { // éƒ½ä¸æ˜¯ 
+            // æä¾›éŒ¯èª¤åƒæ•¸
             string errorValue;
             if (arg->type == SExpType::STRING) errorValue = "\"" + arg->stringVal + "\"";
             else if (arg->type == SExpType::SYMBOL) errorValue = arg->symbolVal;
@@ -2874,7 +2874,7 @@ shared_ptr<SExp> Evaluator::primitiveAdd(vector<shared_ptr<SExp>>& args) {
             else if (arg->type == SExpType::T) errorValue = "#t";
             else if (arg->type == SExpType::PAIR) errorValue = formatExprForError(arg);
             else if (arg->type == SExpType::USER_PROC ) errorValue = "#<procedure " + arg->procName + ">";
-            else errorValue = "­ì¯«±Ò°Ê";
+            else errorValue = "åŸç¥å•Ÿå‹•";
             
             throw EvalError("+ with incorrect argument type", errorValue);
         }
@@ -2898,8 +2898,8 @@ shared_ptr<SExp> Evaluator::primitiveSubtract(vector<shared_ptr<SExp>>& args) {
     int intResult = 0;
     double floatResult = 0.0;
     
-    // ª`·N¯BÂI¾ğ¤¤³~¬ğµM¥X²{ 
-    // ³B²z²Ä¤@­Ó°Ñ¼Æ
+    // æ³¨æ„æµ®é»æ¨¹ä¸­é€”çªç„¶å‡ºç¾ 
+    // è™•ç†ç¬¬ä¸€å€‹åƒæ•¸
     if (args[0]->type == SExpType::FLOAT) {
         hasFloat = true;
         floatResult = args[0]->floatVal;
@@ -2911,7 +2911,7 @@ shared_ptr<SExp> Evaluator::primitiveSubtract(vector<shared_ptr<SExp>>& args) {
         throw EvalError("- with incorrect argument type", formatExprForError(args[0]));
     }
     
-    // ³B²z¨ä¥L°Ñ¼Æ
+    // è™•ç†å…¶ä»–åƒæ•¸
     for (int i = 1; i < args.size(); i++) {
         if (args[i]->type == SExpType::FLOAT) {
             if (!hasFloat) {
@@ -2944,7 +2944,7 @@ shared_ptr<SExp> Evaluator::primitiveSubtract(vector<shared_ptr<SExp>>& args) {
 
 // *
 shared_ptr<SExp> Evaluator::primitiveMultiply(vector<shared_ptr<SExp>>& args) {
-    // ÀË¬d°Ñ¼Æ¼Æ¶q
+    // æª¢æŸ¥åƒæ•¸æ•¸é‡
     if (args.empty()) {
         throw EvalError("incorrect number of arguments", "*");
     }
@@ -2953,7 +2953,7 @@ shared_ptr<SExp> Evaluator::primitiveMultiply(vector<shared_ptr<SExp>>& args) {
     int intResult = 1;
     double floatResult = 1.0;
     
-    // ª`·N¯BÂI¾ğ¤¤³~¬ğµM¥X²{ 
+    // æ³¨æ„æµ®é»æ¨¹ä¸­é€”çªç„¶å‡ºç¾ 
     for (auto arg : args) {
         if (arg->type == SExpType::FLOAT) {
             if (!hasFloat) {
@@ -2990,7 +2990,7 @@ shared_ptr<SExp> Evaluator::primitiveMultiply(vector<shared_ptr<SExp>>& args) {
                 errorValue = formatExprForError(arg);
             } 
 			else {
-                errorValue = "­ì¯«±Ò°Ê";
+                errorValue = "åŸç¥å•Ÿå‹•";
             }
             
             throw EvalError("* with incorrect argument type", errorValue);
@@ -3007,7 +3007,7 @@ shared_ptr<SExp> Evaluator::primitiveMultiply(vector<shared_ptr<SExp>>& args) {
 
 // /
 shared_ptr<SExp> Evaluator::primitiveDivide(vector<shared_ptr<SExp>>& args) {
-	// ÀË¬d°Ñ¼Æ¼Æ¶q
+	// æª¢æŸ¥åƒæ•¸æ•¸é‡
     if (args.empty()) {
         throw EvalError("incorrect number of arguments", "/");
     }
@@ -3016,8 +3016,8 @@ shared_ptr<SExp> Evaluator::primitiveDivide(vector<shared_ptr<SExp>>& args) {
     int intResult = 0;
     double floatResult = 0.0;
     
-    // ª`·N¯BÂI¾ğ¤¤³~¬ğµM¥X²{
-    // ³B²z²Ä¤@­Ó°Ñ¼Æ
+    // æ³¨æ„æµ®é»æ¨¹ä¸­é€”çªç„¶å‡ºç¾
+    // è™•ç†ç¬¬ä¸€å€‹åƒæ•¸
     if (args[0]->type == SExpType::FLOAT) {
         hasFloat = true;
         floatResult = args[0]->floatVal;
@@ -3033,59 +3033,59 @@ shared_ptr<SExp> Evaluator::primitiveDivide(vector<shared_ptr<SExp>>& args) {
         else if (args[0]->type == SExpType::SYMBOL) errorValue = args[0]->symbolVal;
         else if (args[0]->type == SExpType::NIL) errorValue = "nil";
         else if (args[0]->type == SExpType::T) errorValue = "#t";
-        else errorValue = "­ì¯«±Ò°Ê"; 
+        else errorValue = "åŸç¥å•Ÿå‹•"; 
         
         throw EvalError("/ with incorrect argument type", errorValue);
     }
     
-    // ¦pªG¥u¦³¤@­Ó°Ñ¼Æ
+    // å¦‚æœåªæœ‰ä¸€å€‹åƒæ•¸
     if (args.size() == 1) {
         if ((hasFloat && floatResult == 0) || (!hasFloat && intResult == 0)) {
-            throw EvalError("", "/", true);  // °£¥H¹s¿ù»~
+            throw EvalError("", "/", true);  // é™¤ä»¥é›¶éŒ¯èª¤
         }
         
         if (hasFloat) {
             return make_shared<SExp>(1.0 / floatResult);
         } 
 		else {
-            // ¾ã¼Æ±¡ªp¯S®í³B²z
+            // æ•´æ•¸æƒ…æ³ç‰¹æ®Šè™•ç†
             if (intResult == 1) return make_shared<SExp>(1);
             else if (intResult == -1) return make_shared<SExp>(-1);
             else return make_shared<SExp>(0);
         }
     }
     
-    // ³B²z¦h­Ó°Ñ¼Æ
+    // è™•ç†å¤šå€‹åƒæ•¸
     for (int i = 1; i < args.size(); i++) {
         if (args[i]->type == SExpType::FLOAT) {
             hasFloat = true;
             
-            // ÀË¬d°£¼Æ¬O§_¬°0
+            // æª¢æŸ¥é™¤æ•¸æ˜¯å¦ç‚º0
             if (args[i]->floatVal == 0) {
-                throw EvalError("", "/", true);  // °£¥H¹s¿ù»~
+                throw EvalError("", "/", true);  // é™¤ä»¥é›¶éŒ¯èª¤
             }
             
             if (i == 1 && !hasFloat) {
-                // ²Ä¤@¦¸¹J¨ì¯BÂI¼Æ
+                // ç¬¬ä¸€æ¬¡é‡åˆ°æµ®é»æ•¸
                 floatResult = intResult;
             }
             
             floatResult = floatResult / args[i]->floatVal;
         } 
 		else if (args[i]->type == SExpType::INT) {
-            // ÀË¬d°£¼Æ¬O§_¬°0
+            // æª¢æŸ¥é™¤æ•¸æ˜¯å¦ç‚º0
             if (args[i]->intVal == 0) {
-                throw EvalError("", "/", true);  // °£¥H¹s¿ù»~
+                throw EvalError("", "/", true);  // é™¤ä»¥é›¶éŒ¯èª¤
             }
             
             if (hasFloat) {
-                // ¯BÂI¼Æ¹Bºâ
+                // æµ®é»æ•¸é‹ç®—
                 floatResult = floatResult / args[i]->intVal;
             } 
 			else {
-                // ¾ã¼Æ°£ªk
+                // æ•´æ•¸é™¤æ³•
                 intResult = intResult / args[i]->intVal;
-                floatResult = floatResult / args[i]->intVal; // ¦P¨B§ó·s¯BÂI¼Æµ²ªG
+                floatResult = floatResult / args[i]->intVal; // åŒæ­¥æ›´æ–°æµ®é»æ•¸çµæœ
             }
         } 
 		else {
@@ -3095,7 +3095,7 @@ shared_ptr<SExp> Evaluator::primitiveDivide(vector<shared_ptr<SExp>>& args) {
             else if (args[i]->type == SExpType::SYMBOL) errorValue = args[i]->symbolVal;
             else if (args[i]->type == SExpType::NIL) errorValue = "nil";
             else if (args[i]->type == SExpType::T) errorValue = "#t";
-            else errorValue = "­ì¯«±Ò°Ê"; 
+            else errorValue = "åŸç¥å•Ÿå‹•"; 
             
             throw EvalError("/ with incorrect argument type", errorValue);
         }
@@ -3111,7 +3111,7 @@ shared_ptr<SExp> Evaluator::primitiveDivide(vector<shared_ptr<SExp>>& args) {
 
 // not
 shared_ptr<SExp> Evaluator::primitiveNot(vector<shared_ptr<SExp>>& args) {
-	// ÀË¬d°Ñ¼Æ¼Æ¶q
+	// æª¢æŸ¥åƒæ•¸æ•¸é‡
     if (args.size() != 1) {
         throw EvalError("incorrect number of arguments", "not");
     }
@@ -3122,12 +3122,12 @@ shared_ptr<SExp> Evaluator::primitiveNot(vector<shared_ptr<SExp>>& args) {
 
 // >
 shared_ptr<SExp> Evaluator::primitiveGreater(vector<shared_ptr<SExp>>& args) {
-	// ÀË¬d°Ñ¼Æ¼Æ¶q
+	// æª¢æŸ¥åƒæ•¸æ•¸é‡
     if (args.size() < 2) {
         throw EvalError("incorrect number of arguments", ">");
     }
     
-    // step1 : ÀË¬d©Ò¦³°Ñ¼Æ¬O§_¬°¼Æ¦rÃş«¬
+    // step1 : æª¢æŸ¥æ‰€æœ‰åƒæ•¸æ˜¯å¦ç‚ºæ•¸å­—é¡å‹
     for (auto arg : args) {
         if (arg->type != SExpType::INT && arg->type != SExpType::FLOAT) {
             string errorValue;
@@ -3138,13 +3138,13 @@ shared_ptr<SExp> Evaluator::primitiveGreater(vector<shared_ptr<SExp>>& args) {
             else if (arg->type == SExpType::PRIMITIVE_PROC) errorValue = "#<procedure " + arg->procName + ">";
             else if (arg->type == SExpType::PAIR) errorValue = formatExprForError(arg);
             else if (arg->type == SExpType::T) errorValue = "#t";
-            else errorValue = "­ì¯«±Ò°Ê";
+            else errorValue = "åŸç¥å•Ÿå‹•";
             
             throw EvalError("> with incorrect argument type", errorValue);
         }
     }
     
-    // step2 : ½T©w©Ò¦³°Ñ¼Æ³£¬O¼Æ¦r´N¶i¦æ¤ñ¸û
+    // step2 : ç¢ºå®šæ‰€æœ‰åƒæ•¸éƒ½æ˜¯æ•¸å­—å°±é€²è¡Œæ¯”è¼ƒ
     for (int i = 0; i < args.size() - 1; i++) {
         double val1 = (args[i]->type == SExpType::INT) ? args[i]->intVal : args[i]->floatVal;
         double val2 = (args[i+1]->type == SExpType::INT) ? args[i+1]->intVal : args[i+1]->floatVal;
@@ -3159,12 +3159,12 @@ shared_ptr<SExp> Evaluator::primitiveGreater(vector<shared_ptr<SExp>>& args) {
 
 // >=
 shared_ptr<SExp> Evaluator::primitiveGreaterEqual(vector<shared_ptr<SExp>>& args) {
-	// ÀË¬d°Ñ¼Æ¼Æ¶q
+	// æª¢æŸ¥åƒæ•¸æ•¸é‡
     if (args.size() < 2) {
         throw EvalError("incorrect number of arguments", ">=");
     }
     
-    // step1 : ÀË¬d©Ò¦³°Ñ¼Æ¬O§_¬°¼Æ¦rÃş«¬
+    // step1 : æª¢æŸ¥æ‰€æœ‰åƒæ•¸æ˜¯å¦ç‚ºæ•¸å­—é¡å‹
     for (auto arg : args) {
         if (arg->type != SExpType::INT && arg->type != SExpType::FLOAT) {
             string errorValue;
@@ -3175,13 +3175,13 @@ shared_ptr<SExp> Evaluator::primitiveGreaterEqual(vector<shared_ptr<SExp>>& args
             else if (arg->type == SExpType::PRIMITIVE_PROC) errorValue = "#<procedure " + arg->procName + ">";
             else if (arg->type == SExpType::PAIR) errorValue = formatExprForError(arg);
             else if (arg->type == SExpType::T) errorValue = "#t";
-            else errorValue = "­ì¯«±Ò°Ê";
+            else errorValue = "åŸç¥å•Ÿå‹•";
             
             throw EvalError(">= with incorrect argument type", errorValue);
         }
     }
     
-    // step2 : ½T©w©Ò¦³°Ñ¼Æ³£¬O¼Æ¦r´N¶i¦æ¤ñ¸û
+    // step2 : ç¢ºå®šæ‰€æœ‰åƒæ•¸éƒ½æ˜¯æ•¸å­—å°±é€²è¡Œæ¯”è¼ƒ
     for (int i = 0; i < args.size() - 1; i++) {
         double val1 = (args[i]->type == SExpType::INT) ? args[i]->intVal : args[i]->floatVal;
         double val2 = (args[i+1]->type == SExpType::INT) ? args[i+1]->intVal : args[i+1]->floatVal;
@@ -3196,12 +3196,12 @@ shared_ptr<SExp> Evaluator::primitiveGreaterEqual(vector<shared_ptr<SExp>>& args
 
 // <
 shared_ptr<SExp> Evaluator::primitiveLess(vector<shared_ptr<SExp>>& args) {
-	// ÀË¬d°Ñ¼Æ¼Æ¶q
+	// æª¢æŸ¥åƒæ•¸æ•¸é‡
     if (args.size() < 2) {
         throw EvalError("incorrect number of arguments", "<");
     }
     
-    // step1 : ÀË¬d©Ò¦³°Ñ¼Æ¬O§_¬°¼Æ¦rÃş«¬
+    // step1 : æª¢æŸ¥æ‰€æœ‰åƒæ•¸æ˜¯å¦ç‚ºæ•¸å­—é¡å‹
     for (auto arg : args) {
         if (arg->type != SExpType::INT && arg->type != SExpType::FLOAT) {
             string errorValue;
@@ -3212,13 +3212,13 @@ shared_ptr<SExp> Evaluator::primitiveLess(vector<shared_ptr<SExp>>& args) {
             else if (arg->type == SExpType::PRIMITIVE_PROC) errorValue = "#<procedure " + arg->procName + ">";
             else if (arg->type == SExpType::PAIR) errorValue = formatExprForError(arg);
             else if (arg->type == SExpType::T) errorValue = "#t";
-            else errorValue = "­ì¯«±Ò°Ê";
+            else errorValue = "åŸç¥å•Ÿå‹•";
             
             throw EvalError("< with incorrect argument type", errorValue);
         }
     }
     
-    // step2 : ½T©w©Ò¦³°Ñ¼Æ³£¬O¼Æ¦r´N¶i¦æ¤ñ¸û
+    // step2 : ç¢ºå®šæ‰€æœ‰åƒæ•¸éƒ½æ˜¯æ•¸å­—å°±é€²è¡Œæ¯”è¼ƒ
     for (int i = 0; i < args.size() - 1; i++) {
         double val1 = (args[i]->type == SExpType::INT) ? args[i]->intVal : args[i]->floatVal;
         double val2 = (args[i+1]->type == SExpType::INT) ? args[i+1]->intVal : args[i+1]->floatVal;
@@ -3233,12 +3233,12 @@ shared_ptr<SExp> Evaluator::primitiveLess(vector<shared_ptr<SExp>>& args) {
 
 // <=
 shared_ptr<SExp> Evaluator::primitiveLessEqual(vector<shared_ptr<SExp>>& args) {
-	// ÀË¬d°Ñ¼Æ¼Æ¶q
+	// æª¢æŸ¥åƒæ•¸æ•¸é‡
     if (args.size() < 2) {
         throw EvalError("incorrect number of arguments", "<=");
     }
     
-    // step1 : ÀË¬d©Ò¦³°Ñ¼Æ¬O§_¬°¼Æ¦rÃş«¬
+    // step1 : æª¢æŸ¥æ‰€æœ‰åƒæ•¸æ˜¯å¦ç‚ºæ•¸å­—é¡å‹
     for (auto arg : args) {
         if (arg->type != SExpType::INT && arg->type != SExpType::FLOAT) {
             string errorValue;
@@ -3249,13 +3249,13 @@ shared_ptr<SExp> Evaluator::primitiveLessEqual(vector<shared_ptr<SExp>>& args) {
             else if (arg->type == SExpType::PRIMITIVE_PROC) errorValue = "#<procedure " + arg->procName + ">";
             else if (arg->type == SExpType::PAIR) errorValue = formatExprForError(arg);
             else if (arg->type == SExpType::T) errorValue = "#t";
-            else errorValue = "­ì¯«±Ò°Ê";
+            else errorValue = "åŸç¥å•Ÿå‹•";
             
             throw EvalError("<= with incorrect argument type", errorValue);
         }
     }
     
-    // step2 : ½T©w©Ò¦³°Ñ¼Æ³£¬O¼Æ¦r´N¶i¦æ¤ñ¸û
+    // step2 : ç¢ºå®šæ‰€æœ‰åƒæ•¸éƒ½æ˜¯æ•¸å­—å°±é€²è¡Œæ¯”è¼ƒ
     for (int i = 0; i < args.size() - 1; i++) {
         double val1 = (args[i]->type == SExpType::INT) ? args[i]->intVal : args[i]->floatVal;
         double val2 = (args[i+1]->type == SExpType::INT) ? args[i+1]->intVal : args[i+1]->floatVal;
@@ -3270,12 +3270,12 @@ shared_ptr<SExp> Evaluator::primitiveLessEqual(vector<shared_ptr<SExp>>& args) {
 
 // =
 shared_ptr<SExp> Evaluator::primitiveNumEqual(vector<shared_ptr<SExp>>& args) {
-	// ÀË¬d°Ñ¼Æ¼Æ¶q
+	// æª¢æŸ¥åƒæ•¸æ•¸é‡
     if (args.size() < 2) {
         throw EvalError("incorrect number of arguments", "=");
     }
     
-    // step1 : ÀË¬d©Ò¦³°Ñ¼Æ¬O§_¬°¼Æ¦rÃş«¬
+    // step1 : æª¢æŸ¥æ‰€æœ‰åƒæ•¸æ˜¯å¦ç‚ºæ•¸å­—é¡å‹
     for (auto arg : args) {
         if (arg->type != SExpType::INT && arg->type != SExpType::FLOAT) {
             string errorValue;
@@ -3286,13 +3286,13 @@ shared_ptr<SExp> Evaluator::primitiveNumEqual(vector<shared_ptr<SExp>>& args) {
             else if (arg->type == SExpType::PRIMITIVE_PROC) errorValue = "#<procedure " + arg->procName + ">";
             else if (arg->type == SExpType::PAIR) errorValue = formatExprForError(arg);
             else if (arg->type == SExpType::T) errorValue = "#t";
-            else errorValue = "­ì¯«±Ò°Ê";
+            else errorValue = "åŸç¥å•Ÿå‹•";
             
             throw EvalError("= with incorrect argument type", errorValue);
         }
     }
     
-    // step2 : ½T©w©Ò¦³°Ñ¼Æ³£¬O¼Æ¦r´N¶i¦æ¤ñ¸û
+    // step2 : ç¢ºå®šæ‰€æœ‰åƒæ•¸éƒ½æ˜¯æ•¸å­—å°±é€²è¡Œæ¯”è¼ƒ
     for (int i = 0; i < args.size() - 1; i++) {
         double val1 = (args[i]->type == SExpType::INT) ? args[i]->intVal : args[i]->floatVal;
         double val2 = (args[i+1]->type == SExpType::INT) ? args[i+1]->intVal : args[i+1]->floatVal;
@@ -3307,7 +3307,7 @@ shared_ptr<SExp> Evaluator::primitiveNumEqual(vector<shared_ptr<SExp>>& args) {
 
 // string-append
 shared_ptr<SExp> Evaluator::primitiveStringAppend(vector<shared_ptr<SExp>>& args) {
-    // ÀË¬d°Ñ¼Æ¼Æ¶q
+    // æª¢æŸ¥åƒæ•¸æ•¸é‡
     if (args.size() < 2) { 
         throw EvalError("incorrect number of arguments", "string-append");
     }
@@ -3315,7 +3315,7 @@ shared_ptr<SExp> Evaluator::primitiveStringAppend(vector<shared_ptr<SExp>>& args
     string result = "";
     
     for (auto arg : args) {
-    	// step1 : ÀË¬d°Ñ¼Æ¬O§_¬°¦r¦ê
+    	// step1 : æª¢æŸ¥åƒæ•¸æ˜¯å¦ç‚ºå­—ä¸²
         if (arg->type != SExpType::STRING) {
             string errorValue;
             
@@ -3325,12 +3325,12 @@ shared_ptr<SExp> Evaluator::primitiveStringAppend(vector<shared_ptr<SExp>>& args
             else if (arg->type == SExpType::NIL) errorValue = "nil";
             else if (arg->type == SExpType::T) errorValue = "#t";
             else if (arg->type == SExpType::PAIR) errorValue = formatExprForError(arg);
-            else errorValue = "­ì¯«±Ò°Ê";
+            else errorValue = "åŸç¥å•Ÿå‹•";
             
             throw EvalError("string-append with incorrect argument type", errorValue);
         }
         
-        // step2 : ½T©w°Ñ¼Æ¬O¦r¦ê´N¶i¦æ¦êÁp 
+        // step2 : ç¢ºå®šåƒæ•¸æ˜¯å­—ä¸²å°±é€²è¡Œä¸²è¯ 
         result = result + arg->stringVal;
     }
     
@@ -3339,12 +3339,12 @@ shared_ptr<SExp> Evaluator::primitiveStringAppend(vector<shared_ptr<SExp>>& args
 
 // string>?
 shared_ptr<SExp> Evaluator::primitiveStringGreater(vector<shared_ptr<SExp>>& args) {
-	// ÀË¬d°Ñ¼Æ¼Æ¶q
+	// æª¢æŸ¥åƒæ•¸æ•¸é‡
     if (args.size() < 2) {
         throw EvalError("incorrect number of arguments", "string>?");
     }
     
-    // step1 : ÀË¬d©Ò¦³°Ñ¼Æ¬O§_¬°¦r¦ê
+    // step1 : æª¢æŸ¥æ‰€æœ‰åƒæ•¸æ˜¯å¦ç‚ºå­—ä¸²
     for (auto arg : args) {
         if (arg->type != SExpType::STRING) {
             string errorValue;
@@ -3355,13 +3355,13 @@ shared_ptr<SExp> Evaluator::primitiveStringGreater(vector<shared_ptr<SExp>>& arg
             else if (arg->type == SExpType::NIL) errorValue = "nil";
             else if (arg->type == SExpType::T) errorValue = "#t";
             else if (arg->type == SExpType::PAIR) errorValue = formatExprForError(arg);
-            else errorValue = "­ì¯«±Ò°Ê";
+            else errorValue = "åŸç¥å•Ÿå‹•";
             
             throw EvalError("string>? with incorrect argument type", errorValue);
         }
     }
     
-    // step2 : ½T©w©Ò¦³°Ñ¼Æ³£¬O¦r¦ê´N¶i¦æ¤ñ¸û
+    // step2 : ç¢ºå®šæ‰€æœ‰åƒæ•¸éƒ½æ˜¯å­—ä¸²å°±é€²è¡Œæ¯”è¼ƒ
     for (int i = 0; i < args.size() - 1; i++) {
         if (!(args[i]->stringVal > args[i+1]->stringVal)) {
             return make_shared<SExp>(SExpType::NIL);
@@ -3373,12 +3373,12 @@ shared_ptr<SExp> Evaluator::primitiveStringGreater(vector<shared_ptr<SExp>>& arg
 
 // string<?
 shared_ptr<SExp> Evaluator::primitiveStringLess(vector<shared_ptr<SExp>>& args) {
-	// ÀË¬d°Ñ¼Æ¼Æ¶q
+	// æª¢æŸ¥åƒæ•¸æ•¸é‡
     if (args.size() < 2) {
         throw EvalError("incorrect number of arguments", "string<?");
     }
     
-    // step1 : ÀË¬d©Ò¦³°Ñ¼Æ¬O§_¬°¦r¦ê
+    // step1 : æª¢æŸ¥æ‰€æœ‰åƒæ•¸æ˜¯å¦ç‚ºå­—ä¸²
     for (auto arg : args) {
         if (arg->type != SExpType::STRING) {
             string errorValue;
@@ -3389,13 +3389,13 @@ shared_ptr<SExp> Evaluator::primitiveStringLess(vector<shared_ptr<SExp>>& args) 
             else if (arg->type == SExpType::NIL) errorValue = "nil";
             else if (arg->type == SExpType::T) errorValue = "#t";
             else if (arg->type == SExpType::PAIR) errorValue = formatExprForError(arg);
-            else errorValue = "­ì¯«±Ò°Ê";
+            else errorValue = "åŸç¥å•Ÿå‹•";
             
             throw EvalError("string<? with incorrect argument type", errorValue);
         }
     }
     
-    // step2 : ½T©w©Ò¦³°Ñ¼Æ³£¬O¦r¦ê´N¶i¦æ¤ñ¸û
+    // step2 : ç¢ºå®šæ‰€æœ‰åƒæ•¸éƒ½æ˜¯å­—ä¸²å°±é€²è¡Œæ¯”è¼ƒ
     for (int i = 0; i < args.size() - 1; i++) {
         if (!(args[i]->stringVal < args[i+1]->stringVal)) {
             return make_shared<SExp>(SExpType::NIL);
@@ -3407,12 +3407,12 @@ shared_ptr<SExp> Evaluator::primitiveStringLess(vector<shared_ptr<SExp>>& args) 
 
 // string=?
 shared_ptr<SExp> Evaluator::primitiveStringEqual(vector<shared_ptr<SExp>>& args) {
-	// ÀË¬d°Ñ¼Æ¼Æ¶q
+	// æª¢æŸ¥åƒæ•¸æ•¸é‡
     if (args.size() < 2) {
         throw EvalError("incorrect number of arguments", "string=?");
     }
     
-    // step1 : ÀË¬d©Ò¦³°Ñ¼Æ¬O§_¬°¦r¦ê
+    // step1 : æª¢æŸ¥æ‰€æœ‰åƒæ•¸æ˜¯å¦ç‚ºå­—ä¸²
     for (auto arg : args) {
         if (arg->type != SExpType::STRING) {
             string errorValue;
@@ -3422,7 +3422,7 @@ shared_ptr<SExp> Evaluator::primitiveStringEqual(vector<shared_ptr<SExp>>& args)
             else if (arg->type == SExpType::NIL) errorValue = "nil";
             else if (arg->type == SExpType::T) errorValue = "#t";
             else if (arg->type == SExpType::PAIR) errorValue = formatExprForError(arg);
-            else errorValue = "­ì¯«±Ò°Ê";
+            else errorValue = "åŸç¥å•Ÿå‹•";
             
             throw EvalError("string=? with incorrect argument type", errorValue);
         }
@@ -3430,7 +3430,7 @@ shared_ptr<SExp> Evaluator::primitiveStringEqual(vector<shared_ptr<SExp>>& args)
     
     string str = args[0]->stringVal;
     
-    // step2 : ½T©w©Ò¦³°Ñ¼Æ³£¬O¦r¦ê´N¶i¦æ¤ñ¸û
+    // step2 : ç¢ºå®šæ‰€æœ‰åƒæ•¸éƒ½æ˜¯å­—ä¸²å°±é€²è¡Œæ¯”è¼ƒ
     for (int i = 1; i < args.size(); i++) {
         if (args[i]->stringVal != str) {
             return make_shared<SExp>(SExpType::NIL);
@@ -3442,24 +3442,24 @@ shared_ptr<SExp> Evaluator::primitiveStringEqual(vector<shared_ptr<SExp>>& args)
 
 // eqv?
 shared_ptr<SExp> Evaluator::primitiveEqv(vector<shared_ptr<SExp>>& args) {
-    checkArity("eqv?", args, 2); // ½T«O°Ñ¼Æ¼Æ¶q
+    checkArity("eqv?", args, 2); // ç¢ºä¿åƒæ•¸æ•¸é‡
     
     shared_ptr<SExp> a = args[0];
     shared_ptr<SExp> b = args[1];
     
-    // step1 : ÀË¬d¬O§_¬°¦P¤@Ãş«¬
+    // step1 : æª¢æŸ¥æ˜¯å¦ç‚ºåŒä¸€é¡å‹
     if (a->type != b->type) {
         return make_shared<SExp>(SExpType::NIL);
     }
     
-    // step2 : ®Ú¾ÚÃş«¬¶i¦æ¤ñ¸û
+    // step2 : æ ¹æ“šé¡å‹é€²è¡Œæ¯”è¼ƒ
     switch (a->type) {
         case SExpType::INT:
             return (a->intVal == b->intVal) ? make_shared<SExp>(SExpType::T) : make_shared<SExp>(SExpType::NIL);
         case SExpType::FLOAT:
             return (a->floatVal == b->floatVal) ? make_shared<SExp>(SExpType::T) : make_shared<SExp>(SExpType::NIL);
         case SExpType::STRING:
-            // ¹ï©ó¦r¦êÀ³ÀË¬d¬O§_¬O¦P¤@ª«¥ó
+            // å°æ–¼å­—ä¸²æ‡‰æª¢æŸ¥æ˜¯å¦æ˜¯åŒä¸€ç‰©ä»¶
             return (a.get() == b.get()) ? make_shared<SExp>(SExpType::T) : make_shared<SExp>(SExpType::NIL);
         case SExpType::SYMBOL:
             return (a->symbolVal == b->symbolVal) ? make_shared<SExp>(SExpType::T) : make_shared<SExp>(SExpType::NIL);
@@ -3469,7 +3469,7 @@ shared_ptr<SExp> Evaluator::primitiveEqv(vector<shared_ptr<SExp>>& args) {
         case SExpType::PRIMITIVE_PROC:
             return (a->procName == b->procName) ? make_shared<SExp>(SExpType::T) : make_shared<SExp>(SExpType::NIL);
         case SExpType::PAIR:
-            // ¹ï©óÂI¹ï¥u¤ñ¸û¬O§_¬°¦P¤@ª«¥ó
+            // å°æ–¼é»å°åªæ¯”è¼ƒæ˜¯å¦ç‚ºåŒä¸€ç‰©ä»¶
             return (a.get() == b.get()) ? make_shared<SExp>(SExpType::T) : make_shared<SExp>(SExpType::NIL);
         default:
             return make_shared<SExp>(SExpType::NIL);
@@ -3478,7 +3478,7 @@ shared_ptr<SExp> Evaluator::primitiveEqv(vector<shared_ptr<SExp>>& args) {
 
 // equal?
 shared_ptr<SExp> Evaluator::primitiveEqual(vector<shared_ptr<SExp>>& args) {
-    checkArity("equal?", args, 2); // ½T«O°Ñ¼Æ¼Æ¶q
+    checkArity("equal?", args, 2); // ç¢ºä¿åƒæ•¸æ•¸é‡
     
     return isEqual(args[0], args[1]) ? make_shared<SExp>(SExpType::T) : make_shared<SExp>(SExpType::NIL);
 }
@@ -3506,7 +3506,7 @@ shared_ptr<SExp> Evaluator::primitiveErrorObject(vector<shared_ptr<SExp>>& args)
 shared_ptr<SExp> Evaluator::primitiveRead(vector<shared_ptr<SExp>>& args) {
     checkArity("read", args, 0);
     
-    // ¥Î¥ş°ìªº¿é¤JºŞ²z¾¹¦Ó¤£¬O³Ğ·sªº
+    // ç”¨å…¨åŸŸçš„è¼¸å…¥ç®¡ç†å™¨è€Œä¸æ˜¯å‰µæ–°çš„
     if (!globalInput || !globalLexer) {
         shared_ptr<SExp> errorObj = make_shared<SExp>();
         errorObj->type = SExpType::ERROR;
@@ -3515,7 +3515,7 @@ shared_ptr<SExp> Evaluator::primitiveRead(vector<shared_ptr<SExp>>& args) {
     }
     
     try {
-        // ª½±µ¥Î¥ş°ì lexer ©M input ³Ğ·sªº parser
+        // ç›´æ¥ç”¨å…¨åŸŸ lexer å’Œ input å‰µæ–°çš„ parser
         Parser parser(*globalLexer, *globalInput);
         shared_ptr<SExp> expr = parser.parse();
         if (parser.hasEncounteredError()) {
@@ -3528,7 +3528,7 @@ shared_ptr<SExp> Evaluator::primitiveRead(vector<shared_ptr<SExp>>& args) {
         return expr;
     }
     catch (ParseError e) {
-        // ³Ğ¿ù»~ª«¥ó
+        // å‰µéŒ¯èª¤ç‰©ä»¶
         shared_ptr<SExp> errorObj = make_shared<SExp>();
         errorObj->type = SExpType::ERROR;
         
@@ -3552,7 +3552,7 @@ shared_ptr<SExp> Evaluator::primitiveWrite(vector<shared_ptr<SExp>>& args) {
     Printer printer;
     printer.print(args[0]);
     
-    return args[0]; // ¶Ç­ì©l°Ñ¼Æ
+    return args[0]; // å‚³åŸå§‹åƒæ•¸
 }
 
 shared_ptr<SExp> Evaluator::primitiveDisplayString(vector<shared_ptr<SExp>>& args) {
@@ -3562,9 +3562,9 @@ shared_ptr<SExp> Evaluator::primitiveDisplayString(vector<shared_ptr<SExp>>& arg
         throw EvalError("incorrect argument type", "display-string");
     }
     
-    // ª½±µ¦L¦r¦ê¤º®e (¤£§t¤Ş¸¹) 
+    // ç›´æ¥å°å­—ä¸²å…§å®¹ (ä¸å«å¼•è™Ÿ) 
     cout << args[0]->stringVal;
-    return args[0]; // ¶Ç­ì©l°Ñ¼Æ
+    return args[0]; // å‚³åŸå§‹åƒæ•¸
 }
 
 shared_ptr<SExp> Evaluator::primitiveNewline(vector<shared_ptr<SExp>>& args) {
@@ -3623,7 +3623,7 @@ shared_ptr<SExp> Evaluator::primitiveEval(vector<shared_ptr<SExp>>& args, Evalua
 }
 
 bool Evaluator::evalSet(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
-    // »yªk: (set! <symbol> <value>)
+    // èªæ³•: (set! <symbol> <value>)
     if (!expr->cdr || expr->cdr->type != SExpType::PAIR ||
         !expr->cdr->car || expr->cdr->car->type != SExpType::SYMBOL ||
         !expr->cdr->cdr || expr->cdr->cdr->type != SExpType::PAIR ||
@@ -3635,7 +3635,7 @@ bool Evaluator::evalSet(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
     
     string symbol = expr->cdr->car->symbolVal;
     
-    // ¥ı¨D­È²Ä¤G­Ó°Ñ¼Æ
+    // å…ˆæ±‚å€¼ç¬¬äºŒå€‹åƒæ•¸
     shared_ptr<SExp> value;
     if (!EvalSExp(expr->cdr->cdr->car, value)) {
         return false;
@@ -3647,39 +3647,39 @@ bool Evaluator::evalSet(shared_ptr<SExp> expr, shared_ptr<SExp>& result) {
     return true;
 }
 
-// ¨¾¤îµL­­»¼¦^¨ç¼Æ
+// é˜²æ­¢ç„¡é™éå›å‡½æ•¸
 bool Evaluator::willUseLambdaHelper(shared_ptr<SExp> expr, unordered_set<string>& visited) {
-    // ªÅªí¹F¦¡¤£¥Î lambda
+    // ç©ºè¡¨é”å¼ä¸ç”¨ lambda
     if (!expr) return false;
     
-    // ATOM¤£·|ª½±µ¥]§t lambda¡]°£«D¬O¤Ş¥Î¡^
+    // ATOMä¸æœƒç›´æ¥åŒ…å« lambdaï¼ˆé™¤éæ˜¯å¼•ç”¨ï¼‰
     if (expr->type != SExpType::PAIR && expr->type != SExpType::SYMBOL) {
         return false;
     }
     
-    // ÀË¬d¬O§_¤Ş¥Î¤@­Ó lambda
+    // æª¢æŸ¥æ˜¯å¦å¼•ç”¨ä¸€å€‹ lambda
     if (expr->type == SExpType::SYMBOL) {
         string symbolName = expr->symbolVal;
         
-        // ¨¾¤î´`Àô¤Ş¥Î
+        // é˜²æ­¢å¾ªç’°å¼•ç”¨
         if (visited.find(symbolName) != visited.end()) {
             return false;
         }
         
-        // ²Å¸¹¥[¨ì¤w³X°İ¶°¦X
+        // ç¬¦è™ŸåŠ åˆ°å·²è¨ªå•é›†åˆ
         visited.insert(symbolName);
         
-        // ¬dÀô¹Ò¤¤ªº­È
+        // æŸ¥ç’°å¢ƒä¸­çš„å€¼
         auto it = environment.find(symbolName);
         if (it != environment.end()) {
-            // ¦pªG­È¬Ouser©w¸q¨ç¼Æ
+            // å¦‚æœå€¼æ˜¯userå®šç¾©å‡½æ•¸
             if (it->second->type == SExpType::USER_PROC) {
-                // ª½±µÀË¬d¬O§_¬O lambda
+                // ç›´æ¥æª¢æŸ¥æ˜¯å¦æ˜¯ lambda
                 if (it->second->procName == "lambda") {
                     return true;
                 }
                 
-                // ÀË¬d¨ç¼ÆÅé
+                // æª¢æŸ¥å‡½æ•¸é«”
                 if (it->second->body.size() > 0) {
                     for (auto bodyExpr : it->second->body) {
                         if (willUseLambdaHelper(bodyExpr, visited)) {
@@ -3690,31 +3690,31 @@ bool Evaluator::willUseLambdaHelper(shared_ptr<SExp> expr, unordered_set<string>
             }
         }
         
-        // ²¾°£²Å¸¹ (¤¹³\¦b¨ä¥L¦a¤è¨Ï¥Î) 
+        // ç§»é™¤ç¬¦è™Ÿ (å…è¨±åœ¨å…¶ä»–åœ°æ–¹ä½¿ç”¨) 
         visited.erase(symbolName);
         return false;
     }
     
-    // ³B²z lambda ªí¹F¦¡
+    // è™•ç† lambda è¡¨é”å¼
     if (expr->car && expr->car->type == SExpType::SYMBOL && expr->car->symbolVal == "lambda") {
         return true;
     }
     
-    // Á×§K¹L«×¤ÀªR¤º³¡µ²ºc
+    // é¿å…éåº¦åˆ†æå…§éƒ¨çµæ§‹
     if (expr->car && expr->car->type == SExpType::SYMBOL) {
         string op = expr->car->symbolVal;
         
-        // ¹ï©ó define ¶ÈÀË¬d©w¸qªº­Èªº³¡¤À
+        // å°æ–¼ define åƒ…æª¢æŸ¥å®šç¾©çš„å€¼çš„éƒ¨åˆ†
         if (op == "define" && expr->cdr && expr->cdr->type == SExpType::PAIR) {
             if (expr->cdr->car->type == SExpType::SYMBOL) {
-                // ÅÜ¼Æ©w¸q: (define var value)
+                // è®Šæ•¸å®šç¾©: (define var value)
                 if (expr->cdr->cdr && expr->cdr->cdr->type == SExpType::PAIR) {
                     return willUseLambdaHelper(expr->cdr->cdr->car, visited);
                 }
             }
             else if (expr->cdr->car->type == SExpType::PAIR) {
-                // ¨ç¼Æ©w¸q: (define (func args...) body...)
-                // ÀË¬d¨ç¼ÆÅé
+                // å‡½æ•¸å®šç¾©: (define (func args...) body...)
+                // æª¢æŸ¥å‡½æ•¸é«”
                 shared_ptr<SExp> body = expr->cdr->cdr;
                 while (body && body->type == SExpType::PAIR) {
                     if (willUseLambdaHelper(body->car, visited)) {
@@ -3727,13 +3727,13 @@ bool Evaluator::willUseLambdaHelper(shared_ptr<SExp> expr, unordered_set<string>
             return false;
         }
         
-        // ¹ï©ó let ÀË¬dªì©l­È©Mªí¹F¦¡
+        // å°æ–¼ let æª¢æŸ¥åˆå§‹å€¼å’Œè¡¨é”å¼
         if (op == "let" && expr->cdr && expr->cdr->type == SExpType::PAIR) {
-            // ÀË¬d¸j©w¦Cªí¤¤ªºªì©l­È
+            // æª¢æŸ¥ç¶å®šåˆ—è¡¨ä¸­çš„åˆå§‹å€¼
             shared_ptr<SExp> bindings = expr->cdr->car;
             while (bindings && bindings->type == SExpType::PAIR) {
                 if (bindings->car && bindings->car->type == SExpType::PAIR && bindings->car->cdr && bindings->car->cdr->type == SExpType::PAIR) {
-                    // ÀË¬dªì©l­È
+                    // æª¢æŸ¥åˆå§‹å€¼
                     if (willUseLambdaHelper(bindings->car->cdr->car, visited)) {
                         return true;
                     }
@@ -3742,7 +3742,7 @@ bool Evaluator::willUseLambdaHelper(shared_ptr<SExp> expr, unordered_set<string>
                 bindings = bindings->cdr;
             }
             
-            // ÀË¬d let ¥DÅé
+            // æª¢æŸ¥ let ä¸»é«”
             shared_ptr<SExp> body = expr->cdr->cdr;
             while (body && body->type == SExpType::PAIR) {
                 if (willUseLambdaHelper(body->car, visited)) {
@@ -3756,14 +3756,14 @@ bool Evaluator::willUseLambdaHelper(shared_ptr<SExp> expr, unordered_set<string>
         }
     }
     
-    // ³B²z¤@¯ëªº¦Cªíµ²ºc¡]call function¡^
+    // è™•ç†ä¸€èˆ¬çš„åˆ—è¡¨çµæ§‹ï¼ˆcall functionï¼‰
     
-    // ÀË¬d¨ç¼Æ³¡¤À
+    // æª¢æŸ¥å‡½æ•¸éƒ¨åˆ†
     if (willUseLambdaHelper(expr->car, visited)) {
         return true;
     }
     
-    // ÀË¬d©Ò¦³°Ñ¼Æ
+    // æª¢æŸ¥æ‰€æœ‰åƒæ•¸
     shared_ptr<SExp> args = expr->cdr;
     while (args && args->type == SExpType::PAIR) {
         if (willUseLambdaHelper(args->car, visited)) {
@@ -3776,24 +3776,24 @@ bool Evaluator::willUseLambdaHelper(shared_ptr<SExp> expr, unordered_set<string>
     return false;
 }
 
-// Äµ¹îÁ{ÀË 
+// è­¦å¯Ÿè‡¨æª¢ 
 bool Evaluator::willUseLambda(shared_ptr<SExp> expr) {
     unordered_set<string> visited;
     return willUseLambdaHelper(expr, visited);
 }
 
-// ÀË¬d¬O§_¬° (exit)
+// æª¢æŸ¥æ˜¯å¦ç‚º (exit)
 bool isExitExpression(shared_ptr<SExp> expr) {
     if (!expr || expr->type != SExpType::PAIR) {
         return false;
     }
     
-    // ÀË¬d¬O§_¬Oexit²Å¸¹
+    // æª¢æŸ¥æ˜¯å¦æ˜¯exitç¬¦è™Ÿ
     if (!expr->car || expr->car->type != SExpType::SYMBOL || expr->car->symbolVal != "exit") {
         return false;
     }
     
-    // ½T«Oexit«á­±¨S¦³°Ñ¼Æ
+    // ç¢ºä¿exitå¾Œé¢æ²’æœ‰åƒæ•¸
     return expr->cdr && expr->cdr->type == SExpType::NIL;
 }
 
@@ -3806,20 +3806,20 @@ int main() {
     evaluator.setGlobalInput(&input, &lexer);
     bool exitFound = false;
     
-    // ¶]¨ì¨SªF¦è©Î´£³y¦­µ²§ô´N°±
+    // è·‘åˆ°æ²’æ±è¥¿æˆ–æé€ æ—©çµæŸå°±åœ
     while (!exitFound && !input.isEOF()) {
         cout << "> ";
-        hasEvalError = false;  // ¨C­Óªí¹F¦¡¨D­È«e­«¸m¼Ğ°O
-        isTopLevel = true;     // ¨C¦¸·sªº³»¼hªí¹F¦¡µû¦ô®É­«¸m¬° true
+        hasEvalError = false;  // æ¯å€‹è¡¨é”å¼æ±‚å€¼å‰é‡ç½®æ¨™è¨˜
+        isTopLevel = true;     // æ¯æ¬¡æ–°çš„é ‚å±¤è¡¨é”å¼è©•ä¼°æ™‚é‡ç½®ç‚º true
         
-        // ¬°¨C­ÓS-Exp³Ğ·sªº¸ÑÄ¶¾¹
+        // ç‚ºæ¯å€‹S-Expå‰µæ–°çš„è§£è­¯å™¨
         Parser parser(lexer, input);
         shared_ptr<SExp> expr = parser.parse();
         
         if (parser.hasEncounteredError()) {
             cout << parser.getErrorMessage() << endl;
             
-            // ¦pªG¬OEOF¿ù»~¡A«h°h¥X
+            // å¦‚æœæ˜¯EOFéŒ¯èª¤ï¼Œå‰‡é€€å‡º
             if (parser.getErrorMessage().find("END-OF-FILE encountered") != string::npos) {
                 cout << "Thanks for using OurScheme!" << endl;
                 break;
@@ -3828,8 +3828,8 @@ int main() {
             	cout << endl;
 			}
         } 
-        else if (expr) { // ³q¹L¤åªkÀË¬d¶i¤J³o
-            // ÀË¬d (exit)
+        else if (expr) { // é€šéæ–‡æ³•æª¢æŸ¥é€²å…¥é€™
+            // æª¢æŸ¥ (exit)
             if (isExitExpression(expr)) {
                 cout << endl << "Thanks for using OurScheme!" << endl;
                 exitFound = true;
@@ -3841,23 +3841,23 @@ int main() {
             if (usesLambda) haslambda = true;
             else haslambda = false;
 
-            // ¹ï©Ò¦³ªí¹F¦¡¶i¦æ¨D­È
+            // å°æ‰€æœ‰è¡¨é”å¼é€²è¡Œæ±‚å€¼
             shared_ptr<SExp> resultSExp;
             
             evaluator.resetError();
             if (evaluator.EvalSExp(expr, resultSExp)) {
-                // ¦¨¥\¦Lµ²ªG
+                // æˆåŠŸå°çµæœ
                 Printer printer;
                 printer.print(resultSExp);
                 cout << endl << endl;
             }
             else {
-                // ¥¢±Ñ¦L¿ù»~°T®§
+                // å¤±æ•—å°éŒ¯èª¤è¨Šæ¯
                 cout << evaluator.getErrorMessage() << endl << endl;
             }
         }
         
-        // ÀË¬d¬O§_¨ì¹FEOF
+        // æª¢æŸ¥æ˜¯å¦åˆ°é”EOF
         if (input.isEOF() && !exitFound) {
             cout << "> ERROR (no more input) : END-OF-FILE encountered" << endl;
             cout << "Thanks for using OurScheme!" ;
