@@ -38,5 +38,5 @@ Chen You 2025
 - 寫到最後一刻沒能把每一題都過完實屬遺憾，要是還有時間的話，確實會考慮把 porject3 的 Error Handling 全部打掉重寫，也是整個程式碼中的最大敗筆。
 - 建議不要用 AI 強改功能出來，高機率會被改爛（我 project1 的 Error Handling 就是如此，所以後來全部打掉自己重寫ㄏㄏ）。
 ## Conclusion
- ![image](./nicepics/1379079552432738384remix-1748868867306.jpg)
+ ![image](./nicepics/cat.jpg)
 - 不想努力就抄看看吧。
